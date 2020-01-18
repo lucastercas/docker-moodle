@@ -12,11 +12,11 @@ services:
     networks: 
       - moodle_net
     environment: 
-      DB_HOST: moodle_db
+      DB_DRIVER: mysqli
       DB_USER: moodle
       DB_PASS: example
-      DB_DRIVER: mysqli
-      DB_NAME: moodle
+      DB_HOST: moodle_db
+      DB_PORT: "3306"
       MOODLE_ADMINPASS: example
 
   moodle_db:

@@ -106,7 +106,7 @@ When you start this `moodle` image, you have to provide certain environment vari
 ### Installation configuration variables
 
 #### `MOODLEDATA_DIR`
-Directory on filesystem where the `moodledata` will be stored. Moodle
+Directory on filesystem where the `moodledata` will be stored. Default is `/var/www`, so the moodledata dir is `/var/www/moodledata`
 
 #### `SKIP_DB_INSTALL`
 Optional variable, serves to instruct the installation if it should install the moodle tables on the database, then create the config.php file. Default is "false", set it to "true" on the so the scripts skip the database installation.

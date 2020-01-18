@@ -12,13 +12,13 @@ wait_db_connection() {
 install_db() {
   echo "=== Setting up Moodle table on database ==="
   echo "--- Writing /var/www/html/moodle/config.php ---"
-  php $MOODLE_ADMIN_INSTALL --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASS --adminuser=$MOODLE_ADMINUSER --adminpass=$MOODLE_ADMINPASS --adminemail="$MOODLE_ADMINMAIL" --non-interactive --agree-license --lang=en --wwwroot="$MOODLE_WWWROOT" --fullname="$MOODLE_NAME" --shortname="$MOODLE_NAME"
+  php $MOODLE_ADMIN_INSTALL --dataroot=$MOODLEDATA_DIR/moodledata --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASS --adminuser=$MOODLE_ADMINUSER --adminpass=$MOODLE_ADMINPASS --adminemail="$MOODLE_ADMINMAIL" --non-interactive --agree-license --lang=en --wwwroot="$MOODLE_WWWROOT" --fullname="$MOODLE_NAME" --shortname="$MOODLE_NAME"
 }
 
 skip_install_db() {
   echo "=== Skipping database install ==="
   echo "--- Writing /var/www/html/moodle/config.php ---"
-  php $MOODLE_ADMIN_INSTALL --skip-database --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASS --adminuser=$MOODLE_ADMINUSER --adminpass=$MOODLE_ADMINPASS --adminemail="$MOODLE_ADMINMAIL" --non-interactive --agree-license --lang=en --wwwroot="$MOODLE_WWWROOT" --fullname="$MOODLE_NAME" --shortname="$MOODLE_NAME"
+  php $MOODLE_ADMIN_INSTALL --skip-database --dataroot=$MOODLEDATA_DIR/moodledata --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASS --adminuser=$MOODLE_ADMINUSER --adminpass=$MOODLE_ADMINPASS --adminemail="$MOODLE_ADMINMAIL" --non-interactive --agree-license --lang=en --wwwroot="$MOODLE_WWWROOT" --fullname="$MOODLE_NAME" --shortname="$MOODLE_NAME"
 }
 
 MOODLE_ADMIN_INSTALL=/var/www/html/moodle/admin/cli/install.php
