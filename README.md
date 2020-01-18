@@ -17,7 +17,7 @@
 
 ## What is Moodle?
 
-![logo]()
+![logo](https://raw.githubusercontent.com/lucastercas/docker-moodle/master/moodle-logo.png)
 
 ## How to use this image
 ```console
