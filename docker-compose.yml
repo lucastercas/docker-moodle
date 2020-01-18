@@ -11,7 +11,6 @@ services:
       - moodle_net
     environment: 
       DB_HOST: moodle_db
-      DB_PORT: 3306
       DB_USER: moodle
       DB_PASS: example
       DB_DRIVER: mysqli
