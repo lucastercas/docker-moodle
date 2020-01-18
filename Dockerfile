@@ -55,4 +55,11 @@ ARG DB_NAME=moodle
 ENV DB_NAME ${DB_NAME}
 ARG DB_DRIVER
 
+# http port
+EXPOSE 80
+
+# https port
+EXPOSE 443
+
+
 ENTRYPOINT [ "/scripts/run.sh" ]
