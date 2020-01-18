@@ -27,6 +27,51 @@ $ docker run -it lucastercas/moodle
 ### Start a `Moodle` server instance
 
 ### Via `docker-compose`
+```yaml
+version: "2.4"
+
+services:
+
+  moodle:
+    image: lucastercas/moodle:latest
+    container_name: moodle
+    ports:
+      - "80:80"
+    volumes:
+      - moodle_data:/var/www/moodledata
+    networks: 
+      - moodle_net
+    environment: 
+      DB_HOST: moodle_db
+      DB_USER: moodle
+      DB_PASS: example
+      DB_DRIVER: mysqli
+      DB_NAME: moodle
+      MOODLE_ADMINPASS: example
+
+  moodle_db:
+    image: mysql:5.6.46
+    container_name: moodle_db
+    networks: 
+      - moodle_net
+    volumes:
+      - ./my.cnf:/etc/mysql/my.cnf
+      - moodle_db_data:/var/lib/mysql
+    environment: 
+      MYSQL_ROOT_PASSWORD: example_root
+      MYSQL_USER: moodle
+      MYSQL_PASSWORD: example
+      MYSQL_DATABASE: moodle
+
+networks: 
+  moodle_net:
+
+volumes:
+  moodle_db_data:
+    driver: local
+  moodle_data:
+    driver: local
+```
 
 ### On development
 ```yaml

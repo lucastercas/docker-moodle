@@ -7,6 +7,8 @@ services:
     container_name: moodle
     ports:
       - "80:80"
+    volumes:
+      - moodle_data:/var/www/moodledata
     networks: 
       - moodle_net
     environment: 
@@ -16,7 +18,6 @@ services:
       DB_DRIVER: mysqli
       DB_NAME: moodle
       MOODLE_ADMINPASS: example
-      # SKIP_DB_INSTALL: "true"
 
   moodle_db:
     image: mysql:5.6.46
@@ -25,7 +26,7 @@ services:
       - moodle_net
     volumes:
       - ./my.cnf:/etc/mysql/my.cnf
-      # - moodle_data:/var/lib/mysql
+      - moodle_db_data:/var/lib/mysql
     environment: 
       MYSQL_ROOT_PASSWORD: example_root
       MYSQL_USER: moodle
@@ -36,5 +37,7 @@ networks:
   moodle_net:
 
 volumes:
+  moodle_db_data:
+    driver: local
   moodle_data:
     driver: local
