@@ -1,0 +1,19 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Image
+        run: docker build -t lucastercas/moodle .
+      - name: Login to Hub
+        run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
+      - name: Push to Hub
+        run: docker push lucastercas/moodle
