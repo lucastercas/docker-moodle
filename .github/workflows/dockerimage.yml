@@ -14,6 +14,8 @@ jobs:
       - name: Build Image
         run: docker build -t lucastercas/moodle .
       - name: Login to Hub
+        if: github.ref == 'master'
         run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
       - name: Push to Hub
+        if: github.ref == 'master'
         run: docker push lucastercas/moodle
