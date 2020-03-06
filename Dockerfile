@@ -13,13 +13,12 @@ RUN apt-get update; \
 # Moodle installation settings
 ARG MOODLEDATA_DIR=/var/www/moodledata
 ARG MOODLE_DIR=/var/www/html/moodle
+ENV MOODLE_DIR ${MOODLE_DIR}
+ENV MOODLEDATA_DIR ${MOODLEDATA_DIR}
 # Set default branch to 38, but this can be changed by passing
 # --build-arg to docker build cmd
 ARG MOODLE_BRANCH=MOODLE_38_STABLE
 ARG SKIP_DB_INSTALL
-
-ENV MOODLEDATA_DIR ${MOODLEDATA_DIR}
-ENV MOODLE_BRANCH ${MOODLE_BRANCH}
 
 # Configure moodle and moodledata folder permissions
 RUN mkdir ${MOODLEDATA_DIR}; \
