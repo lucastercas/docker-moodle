@@ -1,5 +1,7 @@
 # Docker Image for Moodle
 
+![Docker Image CI](https://github.com/lucastercas/docker-moodle/workflows/Docker%20Image%20CI/badge.svg)
+
 ## Supported tags and respective `Dockerfile` links
 
 - [ `3.8`, `latest` ](https://github.com/lucastercas/docker-moodle)
