@@ -1,8 +1,11 @@
 # Docker Image for Moodle
 
+![Docker Image CI](https://github.com/lucastercas/docker-moodle/workflows/Docker%20Image%20CI/badge.svg)
+
 ## Supported tags and respective `Dockerfile` links
 
-- [`3.8`, `latest`](https://github.com/lucastercas/docker-moodle)
+- [ `3.8`, `latest` ](https://github.com/lucastercas/docker-moodle)
+- [ `3.7` ]
 
 ## Quick reference
 
@@ -39,9 +42,9 @@ services:
       - "80:80"
     volumes:
       - moodle_data:/var/www/moodledata
-    networks: 
+    networks:
       - moodle_net
-    environment: 
+    environment:
       DB_HOST: moodle_db
       DB_USER: moodle
       DB_PASS: example
@@ -52,18 +55,18 @@ services:
   moodle_db:
     image: mysql:5.6.46
     container_name: moodle_db
-    networks: 
+    networks:
       - moodle_net
     volumes:
       - ./my.cnf:/etc/mysql/my.cnf
       - moodle_db_data:/var/lib/mysql
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: example_root
       MYSQL_USER: moodle
       MYSQL_PASSWORD: example
       MYSQL_DATABASE: moodle
 
-networks: 
+networks:
   moodle_net:
 
 volumes:
@@ -89,7 +92,7 @@ services:
       DB_HOST: moodle_db
       DB_DRIVER: mysqli
       MOODLE_ADMINPASS: example
-      
+
   moodle_db:
     image: mysql:5.6.46
     restart: always
@@ -128,7 +131,7 @@ Optional variable, sets the name of the Moodle instance, default is `moodle`.
 #### `MOODLE_WWWROOT`
 Location of the web site, default is `http://localhost/moodle`.
 
-### Database configuration variables 
+### Database configuration variables
 
 #### `DB_HOST`
 Host of the database.
