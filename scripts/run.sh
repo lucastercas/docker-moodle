@@ -40,4 +40,6 @@ else
 fi
 echo "--- Database Installation Finished ---"
 chown root:www-data "$MOODLE_DIR/config.php"
+
+php /var/www/html/moodle/admin/cli/purge_caches.php
 exec /usr/sbin/apache2ctl -DFOREGROUND
