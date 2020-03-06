@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Image
-        run: docker build -t lucastercas/moodle .
+        run: make build_images
       - name: Login to Hub
         if: github.ref == 'master'
         run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
       - name: Push to Hub
         if: github.ref == 'master'
-        run: docker push lucastercas/moodle
+        run: make push_images
