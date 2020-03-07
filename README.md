@@ -22,8 +22,10 @@
 
 <img src="https://raw.githubusercontent.com/lucastercas/docker-moodle/master/moodle-logo.png" width="70%">
 
+[Moodle oficial site](https://moodle.org/?lang=pt_br)
+
 ## How to use this image
-```console
+```bash
 $ docker run -it lucastercas/moodle
 ```
 
