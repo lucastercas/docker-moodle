@@ -18,7 +18,6 @@ ENV MOODLEDATA_DIR ${MOODLEDATA_DIR}
 # Set default branch to 38, but this can be changed by passing
 # --build-arg to docker build cmd
 ARG MOODLE_BRANCH=MOODLE_38_STABLE
-ARG SKIP_DB_INSTALL
 
 # Configure moodle and moodledata folder permissions
 RUN mkdir ${MOODLEDATA_DIR}; \

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-MOODLE_INSTALL_FILE="$MOODLE_DIR/admin/cli/install.php"
+usage() {
+
+}
 
 wait_db_connection() {
   echo "=== Checking if database connection on $DB_HOST:$DB_PORT is open ==="
@@ -25,6 +27,21 @@ skip_install_db() {
   echo "$cmd"; eval "$cmd"
 }
 
+MOODLE_INSTALL_FILE="$MOODLE_DIR/admin/cli/install.php"
+
+while [ "$1" != "" ]; do
+    case $1 in
+        --skip-database )       skip_db=1
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
 echo '__  __                 _ _        ____             _              '
 echo '|  \/  | ___   ___   __| | | ___  |  _ \  ___   ___| | _____ _ __ '
 echo '| |\/| |/ _ \ / _ \ / _` | |/ _ \ | | | |/ _ \ / __| |/ / _ \  __|'
@@ -33,7 +50,7 @@ echo '|_|  |_|\___/ \___/ \__,_|_|\___| |____/ \___/ \___|_|\_\___|_|   '
 
 wait_db_connection
 
-if [ -z "${SKIP_DB_INSTALL}" ]; then
+if [ -z "$skip_db" ]; then
   install_db
 else
   skip_install_db
