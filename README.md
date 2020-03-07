@@ -5,14 +5,14 @@
 ## Supported tags and respective `Dockerfile` links
 
 - [ `3.8`, `latest` ](https://github.com/lucastercas/docker-moodle)
-- [ `3.7` ]
+- [ `3.7` ]()
 
 ## Quick reference
 
 - **Where to get help**:
   [GitHub Issues Page](https://github.com/lucastercas/docker-moodle/issues)
 
-- **Maintened by**:
+- **Maintained by**:
   [lucastercas](https://github.com/lucastercas)
 
 - **Source of this description**:
@@ -20,7 +20,7 @@
 
 ## What is Moodle?
 
-<img src="https://raw.githubusercontent.com/lucastercas/docker-moodle/master/moodle-logo.png" width="75%">
+<img src="https://raw.githubusercontent.com/lucastercas/docker-moodle/master/moodle-logo.png" width="70%">
 
 ## How to use this image
 ```console
@@ -108,11 +108,12 @@ When you start this `moodle` image, you have to provide certain environment vari
 
 ### Installation configuration variables
 
-#### `MOODLEDATA_DIR`
-Directory on filesystem where the `moodledata` will be stored. Moodle
-
 #### `SKIP_DB_INSTALL`
-Optional variable, serves to instruct the installation if it should install the moodle tables on the database, then create the config.php file. Default is "false", set it to "true" on the so the scripts skip the database installation.
+Moodle needs a config.php file to run, that can be created using the `admin/cli/
+install.php` script, which is used on the image to create it, everytime a
+container is created, but this script also initializes the database, creating the
+ tables and populating it. The `SKIP_DB_INSTALL` skips the database creation,
+ and only writes the config.php file.
 
 ### Moodle configuration variables
 
