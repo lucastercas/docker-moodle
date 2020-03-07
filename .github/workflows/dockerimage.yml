@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master, develop ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Image
+        run: make build_images
+      - name: Login to Hub
+        if: github.ref == 'master'
+        run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
+      - name: Push to Hub
+        if: github.ref == 'master'
+        run: make push_images

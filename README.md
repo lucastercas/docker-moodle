@@ -1,15 +1,18 @@
 # Docker Image for Moodle
 
+![Docker Image CI](https://github.com/lucastercas/docker-moodle/workflows/Docker%20Image%20CI/badge.svg)
+
 ## Supported tags and respective `Dockerfile` links
 
-- [`3.8`, `latest`](https://github.com/lucastercas/docker-moodle)
+- [ `3.8`, `latest` ](https://github.com/lucastercas/docker-moodle)
+- [ `3.7` ]()
 
 ## Quick reference
 
 - **Where to get help**:
   [GitHub Issues Page](https://github.com/lucastercas/docker-moodle/issues)
 
-- **Maintened by**:
+- **Maintained by**:
   [lucastercas](https://github.com/lucastercas)
 
 - **Source of this description**:
@@ -17,10 +20,12 @@
 
 ## What is Moodle?
 
-<img src="https://raw.githubusercontent.com/lucastercas/docker-moodle/master/moodle-logo.png" width="75%">
+<img src="https://raw.githubusercontent.com/lucastercas/docker-moodle/master/moodle-logo.png" width="70%">
+
+[Moodle oficial site](https://moodle.org/?lang=pt_br)
 
 ## How to use this image
-```console
+```bash
 $ docker run -it lucastercas/moodle
 ```
 
@@ -39,9 +44,9 @@ services:
       - "80:80"
     volumes:
       - moodle_data:/var/www/moodledata
-    networks: 
+    networks:
       - moodle_net
-    environment: 
+    environment:
       DB_HOST: moodle_db
       DB_USER: moodle
       DB_PASS: example
@@ -52,18 +57,18 @@ services:
   moodle_db:
     image: mysql:5.6.46
     container_name: moodle_db
-    networks: 
+    networks:
       - moodle_net
     volumes:
       - ./my.cnf:/etc/mysql/my.cnf
       - moodle_db_data:/var/lib/mysql
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: example_root
       MYSQL_USER: moodle
       MYSQL_PASSWORD: example
       MYSQL_DATABASE: moodle
 
-networks: 
+networks:
   moodle_net:
 
 volumes:
@@ -89,7 +94,7 @@ services:
       DB_HOST: moodle_db
       DB_DRIVER: mysqli
       MOODLE_ADMINPASS: example
-      
+
   moodle_db:
     image: mysql:5.6.46
     restart: always
@@ -105,11 +110,12 @@ When you start this `moodle` image, you have to provide certain environment vari
 
 ### Installation configuration variables
 
-#### `MOODLEDATA_DIR`
-Directory on filesystem where the `moodledata` will be stored. Default is `/var/www`, so the moodledata dir is `/var/www/moodledata`
-
 #### `SKIP_DB_INSTALL`
-Optional variable, serves to instruct the installation if it should install the moodle tables on the database, then create the config.php file. Default is "false", set it to "true" on the so the scripts skip the database installation.
+Moodle needs a config.php file to run, that can be created using the `admin/cli/
+install.php` script, which is used on the image to create it, everytime a
+container is created, but this script also initializes the database, creating the
+ tables and populating it. The `SKIP_DB_INSTALL` skips the database creation,
+ and only writes the config.php file.
 
 ### Moodle configuration variables
 
@@ -128,7 +134,7 @@ Optional variable, sets the name of the Moodle instance, default is `moodle`.
 #### `MOODLE_WWWROOT`
 Location of the web site, default is `http://localhost/moodle`.
 
-### Database configuration variables 
+### Database configuration variables
 
 #### `DB_HOST`
 Host of the database.

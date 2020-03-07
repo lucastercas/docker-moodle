@@ -3,37 +3,45 @@ version: "2.4"
 services:
 
   moodle:
-    image: lucastercas/moodle:latest
+    build:
+      context: .
+      args:
+        MOODLE_BRANCH: MOODLE_37_STABLE
     container_name: moodle
     ports:
       - "80:80"
     volumes:
       - moodle_data:/var/www/moodledata
-    networks: 
+    networks:
       - moodle_net
-    environment: 
-      DB_DRIVER: mysqli
+    environment:
+      DB_HOST: moodle_db
       DB_USER: moodle
       DB_PASS: example
-      DB_HOST: moodle_db
-      DB_PORT: "3306"
-      MOODLE_ADMINPASS: example
+      DB_DRIVER: mysqli
+      DB_NAME: moodle
+      DB_PORT: 3306
+      MOODLE_ADMINUSER: admin
+      MOODLE_ADMINPASS: q1w2e3r4
+      MOODLE_ADMINMAIL: lucastercas@gmail.com
+      MOODLE_NAME: SaiteAVA
+      MOODLE_WWWROOT: http://localhost/moodle
 
   moodle_db:
     image: mysql:5.6.46
     container_name: moodle_db
-    networks: 
+    networks:
       - moodle_net
     volumes:
       - ./my.cnf:/etc/mysql/my.cnf
       - moodle_db_data:/var/lib/mysql
-    environment: 
+    environment:
       MYSQL_ROOT_PASSWORD: example_root
       MYSQL_USER: moodle
       MYSQL_PASSWORD: example
       MYSQL_DATABASE: moodle
 
-networks: 
+networks:
   moodle_net:
 
 volumes:
