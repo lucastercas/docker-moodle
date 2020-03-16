@@ -15,32 +15,32 @@ services:
     networks:
       - moodle_net
     environment:
-      DB_HOST: adonis
-      DB_USER: root
-      DB_PASS: saiteava_dev
+      DB_HOST: moodle_db
+      DB_USER: moodle
+      DB_PASS: example
       DB_DRIVER: mysqli
       DB_NAME: moodle
-      DB_PORT: 3307
+      DB_PORT: 3306
       MOODLE_ADMINUSER: admin
       MOODLE_ADMINPASS: q1w2e3r4
       MOODLE_ADMINMAIL: lucastercas@gmail.com
       MOODLE_NAME: SaiteAVA
       MOODLE_WWWROOT: http://localhost/moodle
-    command: ["--skip-database"]
+    command: ["--skip-db"]
 
-  # moodle_db:
-  #   image: mysql:5.6.46
-  #   container_name: moodle_db
-  #   networks:
-  #     - moodle_net
-  #   volumes:
-  #     - ./my.cnf:/etc/mysql/my.cnf
-  #     - moodle_db_data:/var/lib/mysql
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: example_root
-  #     MYSQL_USER: moodle
-  #     MYSQL_PASSWORD: example
-  #     MYSQL_DATABASE: moodle
+  moodle_db:
+    image: mysql:5.6.46
+    container_name: moodle_db
+    networks:
+      - moodle_net
+    volumes:
+      - ./my.cnf:/etc/mysql/my.cnf
+      - moodle_db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example_root
+      MYSQL_USER: moodle
+      MYSQL_PASSWORD: example
+      MYSQL_DATABASE: moodle
 
 networks:
   moodle_net:
