@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 usage() {
-
+  echo "Docker Image"
 }
 
 wait_db_connection() {
@@ -31,7 +31,7 @@ MOODLE_INSTALL_FILE="$MOODLE_DIR/admin/cli/install.php"
 
 while [ "$1" != "" ]; do
     case $1 in
-        --skip-database )       skip_db=1
+        --skip-db )       skip_db=1
                                 ;;
         -h | --help )           usage
                                 exit
