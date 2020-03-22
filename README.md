@@ -63,7 +63,7 @@ services:
       - "80:80"
     volumes:
       - moodle_data:/var/www/moodledata
-      - ./moodle/var/www/html/moodle # If on development
+      - ./moodle/:/var/www/html/moodle # If on development
     networks:
       - moodle_net
     environment:
