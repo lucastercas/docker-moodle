@@ -32,6 +32,25 @@ $ docker run -it lucastercas/moodle
 ### Start a `Moodle` server instance
 
 ### Via `docker-compose`
+
+If you run your own mysql on a container, the container needs this file for configuration:
+```cnf
+[client]
+default-character-set = utf8mb4
+
+[mysqld]
+innodb_file_format = Barracuda
+innodb_file_per_table = 1
+innodb_large_prefix
+
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+skip-character-set-client-handshake
+
+[mysql]
+default-character-set = utf8mb4
+```
+
 ```yaml
 version: "2.4"
 
@@ -44,6 +63,7 @@ services:
       - "80:80"
     volumes:
       - moodle_data:/var/www/moodledata
+      - ./moodle/var/www/html/moodle # If on development
     networks:
       - moodle_net
     environment:
