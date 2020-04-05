@@ -5,26 +5,26 @@ usage() {
 }
 
 wait_db_connection() {
-  echo "=== Checking if database connection on $DB_HOST:$DB_PORT is open ==="
+  echo "==> Checking if database connection on $DB_HOST:$DB_PORT is open"
   until nc -z -v -w30 "${DB_HOST}" "${DB_PORT}"; do
-    echo "--> Waiting for database connection for 5 seconds..."
+    echo "==> Waiting for database connection for 5 seconds..."
     sleep 5
   done
-  echo "--- Database on $DB_HOST:$DB_PORT is open for connection"
+  echo "==> Database on $DB_HOST:$DB_PORT is open for connection"
 }
 
 install_db() {
-  echo "=== Setting up Moodle table on database ==="
-  echo "--- Writing $MOODLE_DIR/config.php ---"
+  echo "==> Setting up Moodle table on database"
+  echo "==> Writing $MOODLE_DIR/config.php"
   cmd="php $MOODLE_INSTALL_FILE --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASS --adminuser=$MOODLE_ADMINUSER --adminpass=$MOODLE_ADMINPASS --adminemail=$MOODLE_ADMINMAIL --non-interactive --agree-license --lang=en --wwwroot=$MOODLE_WWWROOT --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME --allow-unstable"
-  echo "$cmd"; eval "$cmd"
+  echo "==> $cmd"; eval "$cmd"
 }
 
 skip_install_db() {
-  echo "=== Skipping database install ==="
-  echo "--- Writing $MOODLE_DIR/config.php ---"
+  echo "==> Skipping database install"
+  echo "==> Writing $MOODLE_DIR/config.php"
   cmd="php $MOODLE_INSTALL_FILE --skip-database --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASS --adminuser=$MOODLE_ADMINUSER --adminpass=$MOODLE_ADMINPASS --adminemail=$MOODLE_ADMINMAIL --non-interactive --agree-license --lang=en --wwwroot=$MOODLE_WWWROOT --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME --allow-unstable"
-  echo "$cmd"; eval "$cmd"
+  echo "==> $cmd"; eval "$cmd"
 }
 
 MOODLE_INSTALL_FILE="$MOODLE_DIR/admin/cli/install.php"
@@ -51,18 +51,24 @@ echo '|_|  |_|\___/ \___/ \__,_|_|\___| |____/ \___/ \___|_|\_\___|_|   '
 wait_db_connection
 
 config_path="$MOODLE_DIR/config.php"
+echo "==> Config path : $config_path"
+
 if [ -f "$config_path" ]; then # If config file is present, do nothing
-    echo "Moodle config file is present, skipping db installation"
+    echo "==> Moodle config file is present, skipping db installation"
 else
-  if [ -z "$skip_db" ]; then # if install db
+  echo "==> Moodle config file is NOT present"
+  if [ -z "$skip_db" ]; then
+    echo "==> Creating database tables"
     install_db
   else
+    echo "==> Skipping creation of database tables"
     skip_install_db
   fi
 fi
 
-echo "--- Database Installation Finished ---"
+echo "==> Database Installation Finished"
 chown root:www-data "$MOODLE_DIR/config.php"
 
+echo "==> Purging caches"
 php /var/www/html/moodle/admin/cli/purge_caches.php
 exec /usr/sbin/apache2ctl -DFOREGROUND
