@@ -51,7 +51,7 @@ echo '|_|  |_|\___/ \___/ \__,_|_|\___| |____/ \___/ \___|_|\_\___|_|   '
 wait_db_connection
 
 config_path="$MOODLE_DIR/config.php"
-echo "==> Config path : $config_path"
+echo "==> Config path: $config_path"
 
 if [ -f "$config_path" ]; then # If config file is present, do nothing
     echo "==> Moodle config file is present, skipping db installation"

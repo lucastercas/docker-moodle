@@ -7,7 +7,7 @@ services:
       context: .
       args:
         MOODLE_BRANCH: MOODLE_37_STABLE
-    container_name: moodle
+    container_name: moodle_server
     ports:
       - "80:80"
     volumes:
@@ -27,7 +27,7 @@ services:
       MOODLE_ADMINMAIL: example@mail.com
       MOODLE_NAME: MoodleDocker
       MOODLE_WWWROOT: http://localhost/moodle
-    command: ["--skip-db"]
+    # command: ["--skip-db"]
 
   moodle_db:
     # image: mysql:5.6.46
