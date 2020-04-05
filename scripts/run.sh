@@ -50,11 +50,17 @@ echo '|_|  |_|\___/ \___/ \__,_|_|\___| |____/ \___/ \___|_|\_\___|_|   '
 
 wait_db_connection
 
-if [ -z "$skip_db" ]; then
-  install_db
+config_path="$MOODLE_DIR/config.php"
+if [ -f "$config_path" ]; then # If config file is present, do nothing
+    echo "Moodle config file is present, skipping db installation"
 else
-  skip_install_db
+  if [ -z "$skip_db" ]; then # if install db
+    install_db
+  else
+    skip_install_db
+  fi
 fi
+
 echo "--- Database Installation Finished ---"
 chown root:www-data "$MOODLE_DIR/config.php"
 
