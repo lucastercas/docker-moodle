@@ -24,7 +24,7 @@ services:
       DB_PORT: 5432
       MOODLE_ADMINUSER: admin
       MOODLE_ADMINPASS: q1w2e3r4
-      MOODLE_ADMINMAIL: lucastercas@gmail.com
+      MOODLE_ADMINMAIL: example@mail.com
       MOODLE_NAME: MoodleDocker
       MOODLE_WWWROOT: http://localhost/moodle
     command: ["--skip-db"]
