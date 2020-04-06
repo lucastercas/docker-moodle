@@ -14,8 +14,8 @@ jobs:
       - name: Build Image
         run: make build_images
       - name: Login to Hub
-        if: github.ref == 'refs/head/master'
+        if: github.ref == 'refs/heads/master'
         run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
       - name: Push to Hub
-        if: github.ref == 'refs/head/master'
+        if: github.ref == 'refs/heads/master'
         run: make push_images
