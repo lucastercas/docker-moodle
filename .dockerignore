@@ -4,3 +4,5 @@ docker-compose.yml
 Dockerfile
 my.cnf
 .github
+moodle-logo.png
+Makefile

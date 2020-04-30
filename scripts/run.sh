@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 usage() {
-  echo "Docker Image"
+  echo "Usage: docker run [IMAGE] [OPTION] ..."
+  echo "Docker image of Moodle\n"
+  echo "Optional arguments:"
 }
 
 wait_db_connection() {
@@ -36,8 +38,6 @@ while [ "$1" != "" ]; do
         -h | --help )           usage
                                 exit
                                 ;;
-        * )                     usage
-                                exit 1
     esac
     shift
 done

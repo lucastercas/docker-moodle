@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Image
-        run: make build_images
+        run: make build-images
       - name: Login to Hub
         if: github.ref == 'refs/heads/master'
         run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
       - name: Push to Hub
         if: github.ref == 'refs/heads/master'
-        run: make push_images
+        run: make push-images

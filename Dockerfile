@@ -1,57 +1,54 @@
 FROM debian:10.3
 
-RUN apt-get update; \
-    apt-get upgrade -y;
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN apt install curl; \
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash; \
-    export NVM_DIR="$HOME/.nvm"; \
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; \
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"; \
-    nvm instal 8.9; \
-    nvm alias default 8.9; \
-    nvm use default;
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt install -y curl
+
+ENV NVM_DIR /usr/local/nvm
+ENV NODE_VERSION 8.9.4
+
+RUN mkdir "${NVM_DIR}" \
+    && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash;
+
+RUN source "${NVM_DIR}"/nvm.sh \
+    && nvm install "${NODE_VERSION}" \
+    && nvm alias default "${NODE_VERSION}" \
+    && nvm use default
+
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 RUN apt install apache2 -y; \
     a2enmod rewrite; \
     service apache2 stop; \
-    apt install git php7.3 php7.3-bcmath php7.3-bz2 php7.3-cgi php7.3-cli php7.3-common php7.3-curl php7.3-dba php7.3-dev php7.3-enchant php7.3-fpm php7.3-gd php7.3-gmp php7.3-imap php7.3-interbase php7.3-intl php7.3-json php7.3-ldap php7.3-mbstring php7.3-mysql php7.3-odbc php7.3-opcache php7.3-pgsql php7.3-phpdbg php7.3-pspell php7.3-readline php7.3-recode php7.3-snmp php7.3-soap php7.3-sqlite3 php7.3-sybase php7.3-tidy php7.3-xml php7.3-xmlrpc php7.3-xsl php7.3-zip libapache2-mod-php7.3 netcat -y;
+    apt install -y git php7.3 php7.3-bcmath php7.3-bz2 php7.3-cgi php7.3-cli php7.3-common php7.3-curl php7.3-dba php7.3-dev php7.3-enchant php7.3-fpm php7.3-gd php7.3-gmp php7.3-imap php7.3-interbase php7.3-intl php7.3-json php7.3-ldap php7.3-mbstring php7.3-mysql php7.3-odbc php7.3-opcache php7.3-pgsql php7.3-phpdbg php7.3-pspell php7.3-readline php7.3-recode php7.3-snmp php7.3-soap php7.3-sqlite3 php7.3-sybase php7.3-tidy php7.3-xml php7.3-xmlrpc php7.3-xsl php7.3-zip libapache2-mod-php7.3 netcat;
 
-# Moodle installation settings
-ARG MOODLEDATA_DIR=/var/www/moodledata
-ARG MOODLE_DIR=/var/www/html/moodle
-ENV MOODLE_DIR ${MOODLE_DIR}
-ENV MOODLEDATA_DIR ${MOODLEDATA_DIR}
-# Set default branch to 38, but this can be changed by passing
-# --build-arg to docker build cmd
-ARG MOODLE_BRANCH=MOODLE_38_STABLE
+# Configure moodledata folder permissions
+ENV MOODLEDATA_DIR /var/www/moodledata
+RUN mkdir "${MOODLEDATA_DIR}" \
+    && chmod 777 -R "${MOODLEDATA_DIR}" \
+    && chown root:www-data -R "${MOODLEDATA_DIR}" \
+    && rm /var/www/html/index.html;
 
-# Configure moodle and moodledata folder permissions
-RUN mkdir ${MOODLEDATA_DIR}; \
-    chmod 777 -R ${MOODLEDATA_DIR}; \
-    chown root:www-data -R ${MOODLEDATA_DIR}
-
-WORKDIR /var/www/html
-RUN git clone -v --progress  git://git.moodle.org/moodle.git; \
-    (cd moodle; git branch --track ${MOODLE_BRANCH} origin/${MOODLE_BRANCH}); \
-    (cd moodle; git checkout ${MOODLE_BRANCH}); \
-    rm /var/www/html/index.html; \
-    chown root:www-data -R ./
+ENV MOODLE_DIR /var/www/html/moodle
+ENV MOODLE_BRANCH=MOODLE_38_STABLE
+WORKDIR "${MOODLE_DIR}"
+RUN git clone -v --progress  git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
+    && git branch --track "${MOODLE_BRANCH}" origin/"${MOODLE_BRANCH}" \
+    && git checkout "${MOODLE_BRANCH}" \
+    && chown root:www-data -R /var/www/html
 
 COPY ./scripts/ /scripts/
 RUN chmod 777 -R /scripts
 
 # Moodle admin settings
-ARG MOODLE_ADMINUSER=admin
-ARG MOODLE_ADMINPASS
-ARG MOODLE_ADMINMAIL=mail@email.com
-ARG MOODLE_NAME=moodle
-ARG MOODLE_WWWROOT=http://localhost/moodle
-
-ENV MOODLE_ADMINUSER ${MOODLE_ADMINUSER}
-ENV MOODLE_ADMINMAIL ${MOODLE_ADMINMAIL}
-ENV MOODLE_NAME ${MOODLE_NAME}
-ENV MOODLE_WWWROOT ${MOODLE_WWWROOT}
+ENV MOODLE_ADMINUSER admin
+ENV MOODLE_ADMINPASS admin_passwd
+ENV MOODLE_ADMINMAIL mail@email.com
+ENV MOODLE_NAME moodle
+ENV MOODLE_WWWROOT http://localhost/moodle
 
 # Moodle DB settings
 ARG DB_HOST
@@ -61,11 +58,7 @@ ARG DB_PASS
 ARG DB_NAME=moodle
 ARG DB_DRIVER
 
-ENV DB_NAME ${DB_NAME}
-
-# http port
 EXPOSE 80
-# https port
-EXPOSE 443
+# EXPOSE 443
 
 ENTRYPOINT [ "/scripts/run.sh" ]
