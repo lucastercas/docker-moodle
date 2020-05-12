@@ -1,25 +1,23 @@
 FROM debian:10.3
 
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt install -y curl
 
+# Configure Node Version Manager
 ENV NVM_DIR /usr/local/nvm
 ENV NODE_VERSION 8.9.4
-
 RUN mkdir "${NVM_DIR}" \
-    && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash;
-
-RUN source "${NVM_DIR}"/nvm.sh \
+    && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash \
+    && source "${NVM_DIR}"/nvm.sh \
     && nvm install "${NODE_VERSION}" \
     && nvm alias default "${NODE_VERSION}" \
     && nvm use default
-
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
+# Install necessary packages
 RUN apt install apache2 -y; \
     a2enmod rewrite; \
     service apache2 stop; \
@@ -33,15 +31,13 @@ RUN mkdir "${MOODLEDATA_DIR}" \
     && rm /var/www/html/index.html;
 
 ENV MOODLE_DIR /var/www/html/moodle
-ENV MOODLE_BRANCH=MOODLE_38_STABLE
+ARG MOODLE_BRANCH="MOODLE_38_STABLE"
+
 WORKDIR "${MOODLE_DIR}"
 RUN git clone -v --progress  git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
     && git branch --track "${MOODLE_BRANCH}" origin/"${MOODLE_BRANCH}" \
     && git checkout "${MOODLE_BRANCH}" \
     && chown root:www-data -R /var/www/html
-
-COPY ./scripts/ /scripts/
-RUN chmod 777 -R /scripts
 
 # Moodle admin settings
 ENV MOODLE_ADMINUSER admin
@@ -52,13 +48,12 @@ ENV MOODLE_WWWROOT http://localhost/moodle
 
 # Moodle DB settings
 ARG DB_HOST
-ARG DB_PORT
 ARG DB_USER
 ARG DB_PASS
 ARG DB_NAME=moodle
 ARG DB_DRIVER
 
-EXPOSE 80
-# EXPOSE 443
+COPY ./scripts /scripts
 
+EXPOSE 80 443
 ENTRYPOINT [ "/scripts/run.sh" ]
