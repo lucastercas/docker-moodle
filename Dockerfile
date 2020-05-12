@@ -51,7 +51,7 @@ ARG DB_HOST
 ARG DB_USER
 ARG DB_PASS
 ARG DB_NAME=moodle
-ARG DB_DRIVER
+ARG DB_TYPE
 
 COPY ./scripts /scripts
 

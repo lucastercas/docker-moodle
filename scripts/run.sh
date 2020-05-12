@@ -25,17 +25,21 @@ fi
 
 wait_db_connection "$DB_PORT"
 
-php-cgi -f configure_db.php dbtype="$DB_TYPE" dbhost="$DB_HOST" dbuser="$DB_USER" dbpass="$DB_PASS" dbname="$DB_NAME" dbport="$DB_PORT"
+php-cgi -f /scripts/configure_db.php dbtype="$DB_TYPE" dbhost="$DB_HOST" dbuser="$DB_USER" dbpass="$DB_PASS" dbname="$DB_NAME" dbport="$DB_PORT"
 
 if [ $? == 1 ]; then
     install_db $DB_PORT
-    elif [ $? == -1 ]; then
+elif [ $? == -1 ]; then
     exit -1;
 fi
 
 echo "==> Configuration finished"
 chown root:www-data "$MOODLE_DIR/config.php"
 chmod -R 02777 /var/www/html/moodledata
+
+if [ -f "/scripts/configure_moodle.php" ]; then
+    php /scripts/configure_moodle.php
+fi
 
 echo "==> Purging caches"
 php /var/www/html/moodle/admin/cli/purge_caches.php

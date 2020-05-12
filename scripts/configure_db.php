@@ -2,6 +2,7 @@
 
 function createConfigOptions()
 {
+  echo "==> Creating config options.\n";
   $config = new stdClass();
   $config->dirroot = "/var/www/html/moodle";
   $config->libdir = "$config->dirroot/lib";
@@ -29,6 +30,7 @@ function createConfigOptions()
 
 function getDriver(stdClass $config)
 {
+  echo "==> Getting driver for $config->dbtype.\n";
   if ($config->dbtype === "mysqli") {
     return @new mysqli(
       $config->dbhost,
@@ -40,13 +42,13 @@ function getDriver(stdClass $config)
     );
   } else if ($config->dbtype === "pgsql") {
     $connection = "user=$config->dbuser password=$config->dbpass dbname=$config->dbname host=$config->dbhost port=$config->dbport";
-    echo "$connection.\n";
     return pg_connect($connection);
   }
 }
 
 function getTablesPostgresSQL(stdClass $config)
 {
+  echo "==> Getting tables from PosgreSQL db.\n";
   $db_conn = getDriver($config);
   $tables = [];
   $prefix = "mdl_";
@@ -69,6 +71,7 @@ function getTablesPostgresSQL(stdClass $config)
 
 function getTablesMySQL(stdClass $config)
 {
+  echo "==> Getting tables from MySQL db.\n";
   $db_conn = getDriver($config);
   echo "==> Getting database tables.\n";
   if ($db_conn->connect_errno !== 0) {
@@ -107,13 +110,13 @@ function createConfigFile(stdClass $config)
     ]
   );
   $content = install_generate_configphp($database, $config);
-  $file = fopen(__DIR__ . "/config.php", "w");
+  $file = fopen("$config->dirroot/config.php", "w");
   fwrite($file, $content);
   fclose($file);
-  echo "==> Configuration file create and written to " . __DIR__ . "/config.php.\n";
+  echo "==> Configuration file create and written to $config->dirroot/config.php.\n";
 }
 
-
+echo "==> Initializing configure_db script.\n";
 $config = createConfigOptions();
 $CFG = $config;
 define('MOODLE_INTERNAL', true);
@@ -128,7 +131,7 @@ else if ($config->dbtype === "pgsql")
 
 if ($tables["config"] || $tables["mdl_config"]) {
   echo "==> Database tables already created.\n";
-  if (file_exists(__DIR__ . "/config.php")) {
+  if (file_exists("$config->dirroot/config.php")) {
     echo "==> Config file already created.\n";
   } else {
     echo "==> Config file NOT created.\n";
@@ -138,9 +141,9 @@ if ($tables["config"] || $tables["mdl_config"]) {
   exit(0);
 } else {
   echo "==> Database tables NOT created.\n";
-  if (file_exists(__DIR__ . "/config.php")) {
+  if (file_exists("$config->dirroot/config.php")) {
     echo "==> Config file already created.\n";
-    unlink(__DIR__ . "/config.php");
+    unlink("$config->dirroot/config.php");
     exit(1);
   } else {
     echo "==> Config file NOT created.\n";
