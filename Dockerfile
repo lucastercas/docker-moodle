@@ -31,7 +31,7 @@ RUN mkdir "${MOODLEDATA_DIR}" \
     && rm /var/www/html/index.html;
 
 ENV MOODLE_DIR /var/www/html/moodle
-ARG MOODLE_BRANCH="MOODLE_38_STABLE"
+ARG MOODLE_BRANCH="MOODLE_37_STABLE"
 
 WORKDIR "${MOODLE_DIR}"
 RUN git clone -v --progress  git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
