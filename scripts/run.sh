@@ -37,6 +37,7 @@ echo "==> Configuration finished"
 chown root:www-data "$MOODLE_DIR/config.php"
 chmod -R 02777 /var/www/html/moodledata
 
+# TODO: Maybe call a bash script instead?
 if [ -f "/scripts/configure_moodle.php" ]; then
     php /scripts/configure_moodle.php
 fi
