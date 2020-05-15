@@ -1,21 +1,21 @@
-name: Docker Image CI
+# name: Docker Image CI
 
-on:
-  push:
-    branches: [ master, develop ]
-  pull_request:
-    branches: [ master, develop ]
+# on:
+#   push:
+#     branches: [ master, develop ]
+#   pull_request:
+#     branches: [ master, develop ]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build Image
-        run: make build-images
-      - name: Login to Hub
-        if: github.ref == 'refs/heads/master'
-        run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
-      - name: Push to Hub
-        if: github.ref == 'refs/heads/master'
-        run: make push-images
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Build Image
+#         run: make build-images
+#       - name: Login to Hub
+#         if: github.ref == 'refs/heads/master'
+#         run: docker login -u ${DOCKER_USER} -p {DOCKER_PASSWD}
+#       - name: Push to Hub
+#         if: github.ref == 'refs/heads/master'
+#         run: make push-images
