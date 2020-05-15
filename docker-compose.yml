@@ -2,51 +2,50 @@ version: "2.4"
 
 services:
 
-  moodle:
+  server:
     build:
       context: .
       args:
         MOODLE_BRANCH: MOODLE_37_STABLE
-    container_name: moodle
+    container_name: moodle_server
     ports:
       - "80:80"
     volumes:
-      - moodle_data:/var/www/moodledata
+      - moodledata:/var/www/html/moodledata
+      - ./scripts:/scripts
     networks:
-      - moodle_net
+      - moodle-net
+    depends_on: 
+      - db
     environment:
-      DB_HOST: moodle_db
-      DB_USER: moodle
-      DB_PASS: example
-      DB_DRIVER: mysqli
+      DB_TYPE: pgsql
+      DB_HOST: db
+      DB_USER: dev_user
+      DB_PASS: dev_passwd
       DB_NAME: moodle
-      DB_PORT: 3306
       MOODLE_ADMINUSER: admin
       MOODLE_ADMINPASS: q1w2e3r4
-      MOODLE_ADMINMAIL: lucastercas@gmail.com
-      MOODLE_NAME: SaiteAVA
+      MOODLE_ADMINMAIL: example@mail.com
+      MOODLE_NAME: moodle_default_docker
       MOODLE_WWWROOT: http://localhost/moodle
-    command: ["--skip-db"]
 
-  moodle_db:
-    image: mysql:5.6.46
+  db:
+    image: postgres:latest
     container_name: moodle_db
+    ports:
+      - 5432:5432
     networks:
-      - moodle_net
+      - moodle-net
     volumes:
-      - ./my.cnf:/etc/mysql/my.cnf
-      - moodle_db_data:/var/lib/mysql
+      - moodle-db:/var/lib/postgresql/data
     environment:
-      MYSQL_ROOT_PASSWORD: example_root
-      MYSQL_USER: moodle
-      MYSQL_PASSWORD: example
-      MYSQL_DATABASE: moodle
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_passwd
+      POSTGRES_DB: moodle
 
 networks:
-  moodle_net:
+  moodle-net:
 
 volumes:
-  moodle_db_data:
-    driver: local
-  moodle_data:
-    driver: local
+  moodle-db:
+  moodledata:
