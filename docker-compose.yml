@@ -1,17 +1,18 @@
-version: "2.4"
+version: "3.7"
+
+# Use for development purposes only
 
 services:
-
   server:
     build:
       context: .
       args:
         MOODLE_BRANCH: MOODLE_37_STABLE
-    container_name: moodle_server
+    container_name: moodle-server
     ports:
       - "80:80"
     volumes:
-      - moodledata:/var/www/html/moodledata
+      - moodle-moodledata:/var/www/html/moodledata
       - ./scripts:/scripts
     networks:
       - moodle-net
@@ -23,21 +24,21 @@ services:
       DB_USER: dev_user
       DB_PASS: dev_passwd
       DB_NAME: moodle
-      MOODLE_ADMINUSER: admin
-      MOODLE_ADMINPASS: q1w2e3r4
+      MOODLE_ADMINUSER: admin_user
+      MOODLE_ADMINPASS: admin_passwd
       MOODLE_ADMINMAIL: example@mail.com
       MOODLE_NAME: moodle_default_docker
       MOODLE_WWWROOT: http://localhost/moodle
 
   db:
     image: postgres:latest
-    container_name: moodle_db
+    container_name: moodle-db
     ports:
       - 5432:5432
     networks:
       - moodle-net
     volumes:
-      - moodle-db:/var/lib/postgresql/data
+      - moodle-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: dev_user
       POSTGRES_PASSWORD: dev_passwd
@@ -47,5 +48,5 @@ networks:
   moodle-net:
 
 volumes:
-  moodle-db:
-  moodledata:
+  moodle-data:
+  moodle-moodledata:
