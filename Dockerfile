@@ -1,59 +1,40 @@
 FROM debian:10.3
-
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
-RUN apt-get update \
+LABEL mantainer "Lucas Terças <lucasmtercas@gmail.com>"
+ARG NODE_VERSION="8.9.4"
+ARG NVM_VERSION="0.35.3"
+ARG PHP_VERSION="7.3"
+# I need bash for some commands
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh; \
+    apt-get update \
     && apt-get upgrade -y \
-    && apt install -y curl
-
-# Configure Node Version Manager
-ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 8.9.4
+    && apt install -y curl apache2 git netcat php"${PHP_VERSION}" php"${PHP_VERSION}"-bcmath php"${PHP_VERSION}"-bz2 php"${PHP_VERSION}"-cgi php"${PHP_VERSION}"-cli php"${PHP_VERSION}"-common php"${PHP_VERSION}"-curl php"${PHP_VERSION}"-dba php"${PHP_VERSION}"-dev php"${PHP_VERSION}"-enchant php"${PHP_VERSION}"-fpm php"${PHP_VERSION}"-gd php"${PHP_VERSION}"-gmp php"${PHP_VERSION}"-imap php"${PHP_VERSION}"-interbase php"${PHP_VERSION}"-intl php"${PHP_VERSION}"-json php"${PHP_VERSION}"-ldap php"${PHP_VERSION}"-mbstring php"${PHP_VERSION}"-mysql php"${PHP_VERSION}"-odbc php"${PHP_VERSION}"-opcache php"${PHP_VERSION}"-pgsql php"${PHP_VERSION}"-phpdbg php"${PHP_VERSION}"-pspell php"${PHP_VERSION}"-readline php"${PHP_VERSION}"-recode php"${PHP_VERSION}"-snmp php"${PHP_VERSION}"-soap php"${PHP_VERSION}"-sqlite3 php"${PHP_VERSION}"-sybase php"${PHP_VERSION}"-tidy php"${PHP_VERSION}"-xml php"${PHP_VERSION}"-xmlrpc php"${PHP_VERSION}"-xsl php"${PHP_VERSION}"-zip libapache2-mod-php"${PHP_VERSION}" \
+    && rm -rf /var/lib/apt/lists/*; \
+    a2enmod rewrite; \
+    service apache2 stop;
+# Install node and NPM
+ENV NVM_DIR="/usr/local/nvm" \
+    NODE_PATH="$NVM_DIR/v$NODE_VERSION/lib/node_modules" \
+    PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
 RUN mkdir "${NVM_DIR}" \
-    && curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v"${NVM_VERSION}"/install.sh | bash \
     && source "${NVM_DIR}"/nvm.sh \
     && nvm install "${NODE_VERSION}" \
     && nvm alias default "${NODE_VERSION}" \
     && nvm use default
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
-# Install necessary packages
-RUN apt install apache2 -y; \
-    a2enmod rewrite; \
-    service apache2 stop; \
-    apt install -y git php7.3 php7.3-bcmath php7.3-bz2 php7.3-cgi php7.3-cli php7.3-common php7.3-curl php7.3-dba php7.3-dev php7.3-enchant php7.3-fpm php7.3-gd php7.3-gmp php7.3-imap php7.3-interbase php7.3-intl php7.3-json php7.3-ldap php7.3-mbstring php7.3-mysql php7.3-odbc php7.3-opcache php7.3-pgsql php7.3-phpdbg php7.3-pspell php7.3-readline php7.3-recode php7.3-snmp php7.3-soap php7.3-sqlite3 php7.3-sybase php7.3-tidy php7.3-xml php7.3-xmlrpc php7.3-xsl php7.3-zip libapache2-mod-php7.3 netcat;
-
-# Configure moodledata folder permissions
-ENV MOODLEDATA_DIR /var/www/moodledata
-RUN mkdir "${MOODLEDATA_DIR}" \
-    && chmod 777 -R "${MOODLEDATA_DIR}" \
-    && chown root:www-data -R "${MOODLEDATA_DIR}" \
-    && rm /var/www/html/index.html;
-
-ENV MOODLE_DIR /var/www/html/moodle
-ARG MOODLE_BRANCH="MOODLE_37_STABLE"
-
+# Set Moodle settings
+ARG MOODLE_VERSION="MOODLE_38_STABLE"
+ENV MOODLE_DIR="/var/www/html/moodle" \
+    MOODLEDATA_DIR="/var/www/moodledata" \
+    MOODLE_WWWROOT="http://localhost/moodle"
 WORKDIR "${MOODLE_DIR}"
-RUN git clone -v --progress  git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
-    && git branch --track "${MOODLE_BRANCH}" origin/"${MOODLE_BRANCH}" \
-    && git checkout "${MOODLE_BRANCH}" \
-    && chown root:www-data -R /var/www/html
-
-# Moodle admin settings
-ENV MOODLE_ADMINUSER admin
-ENV MOODLE_ADMINPASS admin_passwd
-ENV MOODLE_ADMINMAIL mail@email.com
-ENV MOODLE_NAME moodle
-ENV MOODLE_WWWROOT http://localhost/moodle
-
-# Moodle DB settings
-ARG DB_HOST
-ARG DB_USER
-ARG DB_PASS
-ARG DB_NAME=moodle
-ARG DB_TYPE
-
-COPY ./scripts /scripts
-
+# Clone Moodle repository, and checkout selected branch
+RUN git clone -v --progress  git://git.moodle.org/moodle.git --depth=1 -b "${MOODLE_VERSION}" "${MOODLE_DIR}" \
+    && mkdir "${MOODLEDATA_DIR}" \
+    && chmod 777 -R "${MOODLEDATA_DIR}" \
+    && chown root:www-data -R /var/www/ \
+    && rm /var/www/html/index.html
+# Copy custom scripts
+COPY --chown=www-data:www-data ./scripts/docker-entrypoint.sh /usr/local/bin/
+COPY ./scripts/check_db.php /scripts/check_db.php
 EXPOSE 80 443
-ENTRYPOINT [ "/scripts/run.sh" ]
+ENTRYPOINT [ "docker-entrypoint.sh" ]
