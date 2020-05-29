@@ -14,15 +14,52 @@ RUN mkdir ${NVM_DIR} \
       && nvm alias default "$NODE_VERSION" \
       && nvm use default
 ENV MOODLE_DIR "/var/www/html/moodle"
-ARG MOODLE_VERSION="MOODLE_38_STABLE"
-RUN git clone -v --progress  git://git.moodle.org/moodle.git --depth=1 -b "${MOODLE_VERSION}" "${MOODLE_DIR}"
+ARG MOODLE_VERSION="v3.8.3"
+RUN git clone -v --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://git.moodle.org/moodle.git "${MOODLE_DIR}"
 
 FROM debian:10.4-slim
 LABEL mantainer "Lucas Terças <lucasmtercas@gmail.com>"
 ARG PHP_VERSION="7.3"
 RUN apt-get update \
       && apt-get upgrade -y \
-      && apt install -y apache2 netcat php"${PHP_VERSION}" php"${PHP_VERSION}"-bcmath php"${PHP_VERSION}"-bz2 php"${PHP_VERSION}"-cgi php"${PHP_VERSION}"-cli php"${PHP_VERSION}"-common php"${PHP_VERSION}"-curl php"${PHP_VERSION}"-dba php"${PHP_VERSION}"-dev php"${PHP_VERSION}"-enchant php"${PHP_VERSION}"-fpm php"${PHP_VERSION}"-gd php"${PHP_VERSION}"-gmp php"${PHP_VERSION}"-imap php"${PHP_VERSION}"-interbase php"${PHP_VERSION}"-intl php"${PHP_VERSION}"-json php"${PHP_VERSION}"-ldap php"${PHP_VERSION}"-mbstring php"${PHP_VERSION}"-mysql php"${PHP_VERSION}"-odbc php"${PHP_VERSION}"-opcache php"${PHP_VERSION}"-pgsql php"${PHP_VERSION}"-phpdbg php"${PHP_VERSION}"-pspell php"${PHP_VERSION}"-readline php"${PHP_VERSION}"-recode php"${PHP_VERSION}"-snmp php"${PHP_VERSION}"-soap php"${PHP_VERSION}"-sqlite3 php"${PHP_VERSION}"-sybase php"${PHP_VERSION}"-tidy php"${PHP_VERSION}"-xml php"${PHP_VERSION}"-xmlrpc php"${PHP_VERSION}"-xsl php"${PHP_VERSION}"-zip libapache2-mod-php"${PHP_VERSION}" \
+      && apt install -y apache2 \ 
+      netcat \
+      php"${PHP_VERSION}" \
+      php"${PHP_VERSION}"-bcmath \
+      php"${PHP_VERSION}"-bz2 \
+      php"${PHP_VERSION}"-cgi \
+      php"${PHP_VERSION}"-cli \
+      php"${PHP_VERSION}"-common \
+      php"${PHP_VERSION}"-curl \
+      php"${PHP_VERSION}"-dba \
+      php"${PHP_VERSION}"-enchant \
+      php"${PHP_VERSION}"-fpm \
+      php"${PHP_VERSION}"-gd \
+      php"${PHP_VERSION}"-gmp \
+      php"${PHP_VERSION}"-imap \
+      php"${PHP_VERSION}"-interbase \
+      php"${PHP_VERSION}"-intl \
+      php"${PHP_VERSION}"-json \
+      php"${PHP_VERSION}"-ldap \
+      php"${PHP_VERSION}"-mbstring \
+      php"${PHP_VERSION}"-odbc \
+      php"${PHP_VERSION}"-opcache \
+      php"${PHP_VERSION}"-phpdbg \
+      php"${PHP_VERSION}"-pspell \
+      php"${PHP_VERSION}"-readline \
+      php"${PHP_VERSION}"-recode \
+      php"${PHP_VERSION}"-snmp \
+      php"${PHP_VERSION}"-soap \
+      php"${PHP_VERSION}"-sqlite3 \
+      php"${PHP_VERSION}"-pgsql \
+      php"${PHP_VERSION}"-mysql \
+      php"${PHP_VERSION}"-sybase \
+      php"${PHP_VERSION}"-tidy \
+      php"${PHP_VERSION}"-xml \
+      php"${PHP_VERSION}"-xmlrpc \
+      php"${PHP_VERSION}"-xsl \
+      php"${PHP_VERSION}"-zip \
+      libapache2-mod-php"${PHP_VERSION}" \
       && rm -rf /var/lib/apt/lists/*; \
       a2enmod rewrite; \
       service apache2 stop

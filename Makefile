@@ -1,16 +1,18 @@
-build-images-no-cache:
-	docker build -t lucastercas/moodle:38 . --no-cache
-	docker tag lucastercas/moodle:38 lucastercas/moodle:latest
-	docker build --build-arg MOODLE_VERSION=MOODLE_37_STABLE -t lucastercas/moodle:37 . --no-cache
+LATEST_VERSION=v3.8.3
 
-build-images:
-	docker build -t lucastercas/moodle:38 .
-	docker tag lucastercas/moodle:38 lucastercas/moodle:latest
-	docker build --build-arg MOODLE_VERSION=MOODLE_37_STABLE -t lucastercas/moodle:37 .
+build-latest:
+	docker build --build-arg MOODLE_VERSION=$(LATEST_VERSION) -t lucastercas/moodle:$(LATEST_VERSION) .
+	docker tag lucastercas/moodle:$(LATEST_VERSION) lucastercas/moodle:latest
 
-push-images:
+push-latest:
+	docker push lucastercas/moodle:$(LATEST_VERSION)
 	docker push lucastercas/moodle:latest
-	docker push lucastercas/moodle:38
-	docker push lucastercas/moodle:37
 
-build-push-images: build-images push-images
+build-push-latest: build-latest push-latest
+
+
+# Ex: make build-image VERSION=v3.7.6
+build-push-version:
+	docker build --build-arg MOODLE_VERSION=$(VERSION) -t lucastercas/moodle:$(VERSION) .
+	docker push lucastercas/moodle:$(VERSION)
+

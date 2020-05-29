@@ -4,10 +4,10 @@ version: "3.7"
 services:
   moodle:
     image: moodle-test
-    #build:
-    #  context: .
-    #  args:
-    #    MOODLE_VERSION: MOODLE_37_STABLE
+    build:
+      context: .
+      args:
+        MOODLE_VERSION: MOODLE_38_STABLE
     ports:
       - "80:80"
     volumes:
