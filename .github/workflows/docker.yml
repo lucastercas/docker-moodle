@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Docker Login
         if: github.ref == 'refs/heads/master'
-        run: echo ${{ secrets.DOCKER_USERNAME }} | docker login -u ${{ secrets.DOCKER_PASSWORD || --password-stdin
+        run: echo ${{ secrets.DOCKER_USERNAME }} | docker login -u ${{ secrets.DOCKER_PASSWORD }} --password-stdin
       - name: Build and Push Latest
         if: github.ref == 'refs/heads/master'
         run: make build-push-latest
