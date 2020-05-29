@@ -3,7 +3,7 @@ version: "3.7"
 
 services:
   moodle:
-    image: lucastercas/moodle:38
+    image: moodle-test
     #build:
     #  context: .
     #  args:
@@ -12,7 +12,6 @@ services:
       - "80:80"
     volumes:
       - moodle-moodledata:/var/www/moodledata
-      - ./scripts:/scripts
     networks:
       - moodle-net
     depends_on: 
