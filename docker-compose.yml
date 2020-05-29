@@ -3,11 +3,11 @@ version: "3.7"
 
 services:
   moodle:
-    image: lucatercas/moodle:latest
+    image: moodle-test
     build:
       context: .
       args:
-        MOODLE_VERSION: MOODLE_38_STABLE
+        MOODLE_VERSION: v3.8.3
     ports:
       - "80:80"
     volumes:
