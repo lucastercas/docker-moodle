@@ -3,7 +3,7 @@ version: "3.7"
 
 services:
   moodle:
-    image: moodle-test
+    image: lucatercas/moodle:latest
     build:
       context: .
       args:
