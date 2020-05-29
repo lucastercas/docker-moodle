@@ -3,16 +3,15 @@ version: "3.7"
 
 services:
   moodle:
-    image: lucastercas/moodle:38
-    #build:
-    #  context: .
-    #  args:
-    #    MOODLE_VERSION: MOODLE_37_STABLE
+    image: moodle-test
+    build:
+      context: .
+      args:
+        MOODLE_VERSION: MOODLE_38_STABLE
     ports:
       - "80:80"
     volumes:
       - moodle-moodledata:/var/www/moodledata
-      - ./scripts:/scripts
     networks:
       - moodle-net
     depends_on: 
