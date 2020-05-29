@@ -22,7 +22,7 @@ RUN mkdir "${NVM_DIR}" \
     && nvm alias default "${NODE_VERSION}" \
     && nvm use default
 # Set Moodle settings
-ARG MOODLE_VERSION="MOODLE_38_STABLE"
+ARG MOODLE_VERSION="MOODLE_37_STABLE"
 ENV MOODLE_DIR="/var/www/html/moodle" \
     MOODLEDATA_DIR="/var/www/moodledata" \
     MOODLE_WWWROOT="http://localhost/moodle"
