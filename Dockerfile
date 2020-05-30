@@ -14,7 +14,7 @@ ARG BUILD_NUMBER
 ARG GIT_COMMIT
 LABEL org.moodle.image.author="Lucas Terças <lucasmtercas@gmail.com>" \
   org.moodle.image.source="https://github.com/lucastercas/docker-moodle" \
-  org.moodle.image.build="docker build -t lucastercas/moodle:$MOODLE_VERSION" \
+  org.moodle.image.build="docker build -t lucastercas/moodle:$MOODLE_VERSION --build-arg MOODLE_VERSION=$MOODLE_VERSION --build-arg BUILD_DATE=$BUILD_DATE --build-arg BUILD_VERSION=$BUILD_VERSION  --build-arg BUILD_NUMBER=$BUILD_NUMBER  --build-arg GIT_COMMIT=$GIT_COMMIT" \
   org.moodle.image.title="lucastercas/moodle" \
   org.moodle.image.version=$BUILD_VERSION \
   org.moodle.image.description="Docker image for Moodle" \
