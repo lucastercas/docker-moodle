@@ -1,16 +1,15 @@
-
-FROM debian:10.4-slim AS base
-RUN apt-get -y update && apt-get -y --no-install-recommends install git
-ENV MOODLE_DIR "/var/www/html/moodle"
+FROM alpine:3.12.0
+RUN apk add --no-cache git
+ENV MOODLE_DIR "/var/www/html"
 ARG MOODLE_VERSION="v3.8.3"
-RUN git clone -v --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
+RUN git clone --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
       && rm -rf "$MOODLE_DIR"/.git
 
 FROM debian:10.4-slim
 ARG MOODLE_VERSION="v3.8.3"
-ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG BUILD_NUMBER
+ARG BUILD_DATE
 ARG GIT_COMMIT
 LABEL org.moodle.image.author="Lucas Terças <lucasmtercas@gmail.com>" \
   org.moodle.image.source="https://github.com/lucastercas/docker-moodle" \
@@ -60,24 +59,27 @@ RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \
       php"$PHP_VERSION"-xsl \
       php"$PHP_VERSION"-zip \
       libapache2-mod-php"$PHP_VERSION" \
+      && apt-get purge -y --auto-remove \
       && rm -rf /var/lib/apt/lists/*; \
-      a2enmod rewrite; \
+      a2dismod mpm_event \
+      && a2enmod rewrite; \
       service apache2 stop
 # Set Moodle settings
-ENV MOODLE_DIR="/var/www/html/moodle" \
+ENV MOODLE_DIR="/var/www/html" \
   MOODLEDATA_DIR="/var/www/moodledata" \
-  MOODLE_WWWROOT="http://localhost/moodle" \
+  MOODLE_WWWROOT="http://localhost" \
   MOODLE_ADMINUSER="admin_user" \
   MOODLE_ADMINMAIL="mail@mail.com" \
   MOODLE_NAME="moodle" \
   DB_NAME="moodle"
-COPY --from=base /var/www/html/moodle /var/www/html/moodle
-RUN mkdir "$MOODLEDATA_DIR" \
-      && chmod 777 -R "$MOODLEDATA_DIR" \
-      && chown root:www-data -R "$MOODLEDATA_DIR" \
-      && rm /var/www/html/index.html
+RUN mkdir -p "$MOODLEDATA_DIR" \
+      && chmod 755 -R "$MOODLEDATA_DIR" \
+      && chown www-data:www-data -R "$MOODLEDATA_DIR" \
+      && rm "$MOODLE_DIR"/index.html
+COPY --from=base /var/www/html /var/www/html
 WORKDIR "$MOODLE_DIR"
 COPY --chown=www-data:www-data ./scripts/docker-entrypoint.sh /usr/local/bin/
-COPY ./scripts/check_db.php /scripts/check_db.php
+COPY --chown=www-data:www-data ./scripts/check_db.php /scripts/check_db.php
+STOPSIGNAL SIGWINCH
 EXPOSE 80 443
 ENTRYPOINT [ "docker-entrypoint.sh" ]

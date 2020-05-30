@@ -21,11 +21,7 @@ services:
       DB_HOST: "db"
       DB_USER: "dev_user"
       DB_PASS: "dev_passwd"
-      DB_NAME: "moodle"
-      MOODLE_ADMINUSER: "admin_user"
       MOODLE_ADMINPASS: "admin_passwd"
-      MOODLE_ADMINMAIL: "example@mail.com"
-      MOODLE_NAME: "moodle_default_docker"
 
   db:
     image: postgres:13-alpine

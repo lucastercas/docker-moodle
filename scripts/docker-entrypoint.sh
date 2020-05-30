@@ -41,7 +41,7 @@ elif [ $? == -1 ]; then
 fi
 
 echo "--> Configuration finished"
-chown root:www-data "$MOODLE_DIR/config.php"
+chown www-data:www-data "$MOODLE_DIR/config.php"
 
 # TODO: Maybe call a bash script instead?
 # In case a custom Moodle installation need to set extra plugins or parameters,
