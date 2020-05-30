@@ -6,7 +6,20 @@ RUN git clone -v --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git
       && rm -rf "$MOODLE_DIR"/.git
 
 FROM debian:10.4-slim
-LABEL mantainer "Lucas Terças <lucasmtercas@gmail.com>"
+ARG MOODLE_VERSION="v3.8.3"
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG BUILD_NUMBER
+ARG GIT_COMMIT
+LABEL org.moodle.image.author="Lucas Terças <lucasmtercas@gmail.com>" \
+  org.moodle.image.source="https://github.com/lucastercas/docker-moodle" \
+  org.moodle.image.build="docker build -t lucastercas/moodle:$MOODLE_VERSION" \
+  org.moodle.image.title="lucastercas/moodle" \
+  org.moodle.image.version=$BUILD_VERSION \
+  org.moodle.image.description="Docker image for Moodle" \
+  org.moodle.image.build_number=$BUILD_NUMBER \
+  org.moodle.image.created=$BUILD_DATE \
+  org.moodle.image.commit=$GIT_COMMIT
 ARG PHP_VERSION="7.3"
 RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \ 
       netcat \
