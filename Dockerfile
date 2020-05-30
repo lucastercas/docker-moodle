@@ -52,7 +52,11 @@ RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \
 # Set Moodle settings
 ENV MOODLE_DIR="/var/www/html/moodle" \
   MOODLEDATA_DIR="/var/www/moodledata" \
-  MOODLE_WWWROOT="http://localhost/moodle"
+  MOODLE_WWWROOT="http://localhost/moodle" \
+  MOODLE_ADMINUSER="admin_user" \
+  MOODLE_ADMINMAIL="mail@mail.com" \
+  MOODLE_NAME="moodle" \
+  DB_NAME="moodle"
 COPY --from=base /var/www/html/moodle /var/www/html/moodle
 RUN mkdir "$MOODLEDATA_DIR" \
       && chmod 777 -R "$MOODLEDATA_DIR" \
