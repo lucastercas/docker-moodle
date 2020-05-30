@@ -10,6 +10,8 @@ push-latest:
 
 build-push-latest: build-latest push-latest
 
+build-version:
+	docker build --build-arg MOODLE_VERSION=$(VERSION) -t lucastercas/moodle:$(VERSION) .
 
 # Ex: make build-image VERSION=v3.7.6
 build-push-version:

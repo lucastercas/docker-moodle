@@ -2,7 +2,8 @@ FROM debian:10.4-slim AS base
 RUN apt-get -y update && apt-get -y --no-install-recommends install git
 ENV MOODLE_DIR "/var/www/html/moodle"
 ARG MOODLE_VERSION="v3.8.3"
-RUN git clone -v --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://git.moodle.org/moodle.git "${MOODLE_DIR}"
+RUN git clone -v --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://git.moodle.org/moodle.git "${MOODLE_DIR}" \
+      && rm -rf "$MOODLE_DIR"/.git
 
 FROM debian:10.4-slim
 LABEL mantainer "Lucas Terças <lucasmtercas@gmail.com>"
