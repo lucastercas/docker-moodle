@@ -1,3 +1,4 @@
+
 FROM debian:10.4-slim AS base
 RUN apt-get -y update && apt-get -y --no-install-recommends install git
 ENV MOODLE_DIR "/var/www/html/moodle"
