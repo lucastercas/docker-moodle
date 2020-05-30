@@ -1,6 +1,9 @@
 name: Docker Deploy
 
-on: push
+on:
+  push:
+    branchs:
+      - master
 
 jobs:
   build:
@@ -12,9 +15,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build v3.8.3
-        if: github.ref == 'refs/heads/master'
-        run: docker build -t lucastercas/moodle:v3.8.3 --build-arg BUILD_DATE=$(date +%D) --build-arg BUILD_VERSION="1.0.0" --build-arg BUILD_NUMBER=$GITHUB_RUN_ACTION --build-arg GIT_COMMIT=$GITHUB_SHA
-      - name: Push v3.8.3
-        if: github.ref == 'refs/heads/master'
-        run: docker push lucastercas/moodle:v3.8.3
+        env:
+          MOODLE_VERSION: v3.8.3
+        run: echo docker build -t lucastercas/moodle:$MOODLE_VERSION --build-arg BUILD_DATE=$(date +%D) --build-arg BUILD_VERSION="1.0.0" --build-arg BUILD_NUMBER=$GITHUB_RUN_ACTION --build-arg GIT_COMMIT=$GITHUB_SHA
 
