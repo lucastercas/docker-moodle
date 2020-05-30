@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  v3.8.3-latest:
+  v3-8-3_latest:
     env:
       MOODLE_VERSION: v3.8.3
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           docker push lucastercas/moodle:$MOODLE_VERSION
           docker push lucastercas/moodle:latest
 
-  v3.7.6:
+  v3-7-6:
     env:
       MOODLE_VERSION: v3.7.6
     runs-on: ubuntu-latest
