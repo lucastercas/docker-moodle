@@ -1,4 +1,4 @@
-FROM alpine:3.12.0
+FROM alpine:3.12.0 AS base
 RUN apk add --no-cache git
 ENV MOODLE_DIR "/var/www/html"
 ARG MOODLE_VERSION="v3.8.3"
@@ -6,6 +6,7 @@ RUN git clone --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://
       && rm -rf "$MOODLE_DIR"/.git
 
 FROM debian:10.4-slim
+RUN  echo "Hello World"
 ARG MOODLE_VERSION="v3.8.3"
 ARG BUILD_VERSION
 ARG BUILD_NUMBER
@@ -64,7 +65,7 @@ RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \
       a2dismod mpm_event \
       && a2enmod rewrite; \
       service apache2 stop
-# Set Moodle settings
+## Set Moodle settings
 ENV MOODLE_DIR="/var/www/html" \
   MOODLEDATA_DIR="/var/www/moodledata" \
   MOODLE_WWWROOT="http://localhost" \
@@ -76,7 +77,7 @@ RUN mkdir -p "$MOODLEDATA_DIR" \
       && chmod 755 -R "$MOODLEDATA_DIR" \
       && chown www-data:www-data -R "$MOODLEDATA_DIR" \
       && rm "$MOODLE_DIR"/index.html
-COPY --from=base /var/www/html /var/www/html
+COPY --from=base --chown=www-data:www-data /var/www/html /var/www/html
 WORKDIR "$MOODLE_DIR"
 COPY --chown=www-data:www-data ./scripts/docker-entrypoint.sh /usr/local/bin/
 COPY --chown=www-data:www-data ./scripts/check_db.php /scripts/check_db.php
