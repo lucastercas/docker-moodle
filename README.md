@@ -77,13 +77,13 @@ Optional variable, sets the email of the administrator user, default is `mail@em
 Optional variable, sets the name of the Moodle instance, default is `moodle`.
 
 #### `MOODLE_WWWROOT`
-Location of the web site, default is `http://localhost/moodle`.
+Optional variable, location of the web site, default is `http://localhost`.
 
 #### `MOODLE_DIR`
-Location of Moodle, default is `/var/www/html/moodle`.
+Optional variable, location of Moodle, default is `/var/www/html`.
 
 #### `MOODLE_DATADIR`
-Location of moodledata, default is `/var/www/moodledata`.
+Optional variables, location of moodledata, default is `/var/www/moodledata`.
 
 ### Database configuration variables
 
