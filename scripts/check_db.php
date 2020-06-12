@@ -107,7 +107,7 @@ echo "==> Initializing check_db script.\n";
 $CFG = createConfigOptions();
 define('MOODLE_INTERNAL', true);
 define('CLI_SCRIPT', true);
-require_once(getenv("MOODLE_DIR") . '/clilib.php');
+require_once(getenv("MOODLE_DIR") . '/lib/clilib.php');
 
 $tables = null;
 if ($CFG->dbtype === "mysqli") $tables = getTablesMySQL();
