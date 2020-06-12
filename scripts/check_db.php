@@ -9,8 +9,6 @@
  * Returns 0 if there is a Moodle table present
  * Returns 1 if there is no Moodle table present
  */
-
-// Create the configuration options to write to the config.php file
 function createConfigOptions()
 {
   echo "--> Creating config options.\n";
@@ -20,13 +18,13 @@ function createConfigOptions()
   $config->dbtype = getenv("DB_DRIVER");
   $config->dbhost = getenv("DB_HOST");
   $config->dbuser = getenv("DB_USER");
-  $config->dbpass = getenv("DB_PASS");
+  $config->dbpass = getenv("DB_PASSWORD");
   $config->dbname = getenv("DB_NAME");
   $config->prefix = "mdl_";
   $config->dbsocket = "";
-  $config->wwwroot = "http://localhost/moodle";
+  $config->wwwroot = "http://localhost";
   $config->dataroot = getenv("MOODLEDATA_DIR");
-  $config->admin = "admin";
+  $config->admin = getenv("MOODLE_ADMIN_USER");
   $config->directorypermissions = 0777;
   $config->dbport = getenv("DB_PORT");
   return $config;
@@ -51,10 +49,16 @@ function getDriver(stdClass $config)
   }
 }
 
-function getTablesPostgresSQL(stdClass $config)
+function getTablesPostgresSQL()
 {
+  global $CFG;
   echo "--> Getting tables from PosgreSQL db.\n";
-  $db_conn = getDriver($config);
+  try {
+    $db_conn = getDriver($CFG);
+  } catch( Exception $e ) {
+    echo "Error connecting to MySQL database: $e";
+    return null;
+  }
   $tables = [];
   $prefix = "mdl_";
   $sql = "SELECT c.relname
@@ -71,49 +75,55 @@ function getTablesPostgresSQL(stdClass $config)
     }
     pg_free_result($result);
   }
+  echo "--> Returning tables.\n";
   return $tables;
 }
 
-function getTablesMySQL(stdClass $config)
+function getTablesMySQL()
 {
+  global $CFG;
   echo "--> Getting tables from MySQL db.\n";
-  $db_conn = getDriver($config);
-  if ($db_conn->connect_errno !== 0) {
-    echo "Error connecting to database.\n";
-    exit(-1);
+  try {
+    $db_conn = getDriver($CFG);
+  } catch( Exception $e ) {
+    echo "Error connecting to MySQL database: $e";
+    return null;
   }
   $result = $db_conn->query("SHOW TABLES");
   $tables = [];
   if ($result) {
-    $len = strlen($config->prefix);
+    $len = strlen('mdl_');
     while ($arr = $result->fetch_assoc()) {
       $tablename = reset($arr);
       $tablename = substr($tablename, $len);
       $tables[$tablename] = $tablename;
     }
   }
+  echo "--> Returning tables.\n";
   return $tables;
 }
 
 echo "==> Initializing check_db script.\n";
-$config = createConfigOptions();
-$CFG = $config;
+$CFG = createConfigOptions();
 define('MOODLE_INTERNAL', true);
 define('CLI_SCRIPT', true);
-require_once($config->libdir . '/clilib.php');
+require_once(getenv("MOODLE_DIR") . '/clilib.php');
 
 $tables = null;
-if ($config->dbtype === "mysqli") $tables = getTablesMySQL($config);
-else if ($config->dbtype === "pgsql") $tables = getTablesPostgresSQL($config);
+if ($CFG->dbtype === "mysqli") $tables = getTablesMySQL();
+else if ($CFG->dbtype === "pgsql") $tables = getTablesPostgresSQL();
 
 if ($tables) {
   if (array_key_exists("config", $tables) || array_key_exists("mdl_config", $tables)) {
-    echo "--> Moodle table already on DB.\n";
+    echo "--> Moodle tables already on DB.\n";
     exit(0);
   } else {
-    echo "--> Moodle table NOT on DB.\n";
+    echo "--> Database has tables, but not Moodle ones.\n";
     exit(1);
   }
+} else {
+  echo "--> No tables on database.\n";
+  exit (2);
 }
+exit(-1); 
 
-exit(-1);

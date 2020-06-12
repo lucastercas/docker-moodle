@@ -12,6 +12,8 @@ services:
       - "80:80"
     volumes:
       - moodle-moodledata:/var/www/moodledata
+      - ./scripts/check_db.php:/scripts/check_db.php
+      - ./scripts/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
     networks:
       - moodle-net
     depends_on: 
@@ -20,8 +22,8 @@ services:
       DB_DRIVER: "pgsql"
       DB_HOST: "db"
       DB_USER: "dev_user"
-      DB_PASS: "dev_passwd"
-      MOODLE_ADMINPASS: "admin_passwd"
+      DB_PASSWORD: "dev_passwd"
+      MOODLE_ADMIN_PASSWORD: "admin_passwd"
 
   db:
     image: postgres:13-alpine

@@ -68,11 +68,15 @@ RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \
 ## Set Moodle settings
 ENV MOODLE_DIR="/var/www/html" \
   MOODLEDATA_DIR="/var/www/moodledata" \
-  MOODLE_WWWROOT="http://localhost" \
-  MOODLE_ADMINUSER="admin_user" \
-  MOODLE_ADMINMAIL="mail@mail.com" \
+  MOODLE_ADMIN_USER="admin_user" \
+  MOODLE_ADMIN_EMAIL="mail@mail.com" \
   MOODLE_NAME="moodle" \
   DB_NAME="moodle"
+ARG DB_DRIVER
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_USER
+ARG DB_PASSWORD
 RUN mkdir -p "$MOODLEDATA_DIR" \
       && chmod 755 -R "$MOODLEDATA_DIR" \
       && chown www-data:www-data -R "$MOODLEDATA_DIR" \
@@ -83,4 +87,5 @@ COPY --chown=www-data:www-data ./scripts/docker-entrypoint.sh /usr/local/bin/
 COPY --chown=www-data:www-data ./scripts/check_db.php /scripts/check_db.php
 STOPSIGNAL SIGWINCH
 EXPOSE 80 443
+VOLUME /var/www/moodledata
 ENTRYPOINT [ "docker-entrypoint.sh" ]
