@@ -23,6 +23,7 @@ LABEL org.moodle.image.author="Lucas Terças <lucasmtercas@gmail.com>" \
   org.moodle.image.commit=$GIT_COMMIT
 ARG PHP_VERSION="7.3"
 RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \ 
+      vim \
       netcat \
       php"$PHP_VERSION" \
       php"$PHP_VERSION"-bcmath \

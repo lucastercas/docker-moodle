@@ -6,6 +6,13 @@ function err() {
   exit -1
 }
 
+function write_config() {
+  echo "--> Writing config file"
+  cmd="php $MOODLE_DIR/admin/cli/install.php --skip-database --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASSWORD --adminuser=$MOODLE_ADMIN_USER --adminpass=$MOODLE_ADMIN_PASSWORD --adminemail=$MOODLE_ADMIN_EMAIL --non-interactive --agree-license --lang=en --wwwroot=http://127.0.0.1:80 --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME"
+  #cmd="php $MOODLE_DIR/admin/cli/install_database.php --agree-license --adminpass=$MOODLE_ADMIN_PASSWORD"
+  eval "$cmd"
+}
+
 function create_tables() {
   echo "--> Creating Moodle tables on database"
   cmd="php $MOODLE_DIR/admin/cli/install.php --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASSWORD --adminuser=$MOODLE_ADMIN_USER --adminpass=$MOODLE_ADMIN_PASSWORD --adminemail=$MOODLE_ADMIN_EMAIL --non-interactive --agree-license --lang=en --wwwroot=http://127.0.0.1:80 --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME"
@@ -40,37 +47,41 @@ if [[ -z "${DB_USER:-}"  ]]; then
   export DB_USER="root"
 fi
 
-
 php /scripts/check_db.php
 check_db_return=$?
 
 if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
   create_tables
+elif (( $check_db_return == 0 )); then
+  echo "--> Continuing Moodle installation."
+  write_config
 elif (( $check_db_return == -1 )); then
-  err "--> Error getting database status"
+  err "--> Error on check_db.php script"
 else
   err "--> Error getting database status"
 fi
 
-rm "$MOODLE_DIR"/config.php
+mv "$MOODLE_DIR"/config.php "$MOODLE_DIR"/config.bk.php
 cat > "$MOODLE_DIR"/config.php <<EOF
 <?php
+
 unset(\$CFG);
 global \$CFG;
 \$CFG = new stdClass();
+
 \$CFG->dbtype = '${DB_DRIVER}';
 \$CFG->dblibrary = 'native';
 \$CFG->dbhost = '${DB_HOST}';
 \$CFG->dbname = '${DB_NAME}';
 \$CFG->dbuser = '${DB_USER}';
 \$CFG->dbpass = '${DB_PASSWORD}';
-\$CFG->dboptions= array(
+\$CFG->prefix = 'mdl_';
+\$CFG->dboptions = array(
   'dbpersist' => 0,
-  'dbport' => '${DB_PORT}',
+  'dbport' => ${DB_PORT},
   'dbsocket' => '',
-  'dbcollation' => 'utf8mb4_unicode_ci',
 );
-\$CFG->prefix    = 'mdl_';
+
 if (empty(\$_SERVER['HTTP_HOST'])) {
   \$_SERVER['HTTP_HOST'] = '127.0.0.1:80';
 }
@@ -80,8 +91,13 @@ if (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on') {
   \$CFG->wwwroot   = 'http://' . \$_SERVER['HTTP_HOST'];
 };
 \$CFG->dataroot = '/var/www/moodledata';
-\$CFG->admin = '${MOODLE_ADMIN_USER}';
+\$CFG->admin = 'admin';
+
+\$CFG->directorypermissions = 02777;
+
 require_once(__DIR__ . '/lib/setup.php');
+
+// No closing tag on this file
 EOF
 
 echo "--> Configuration finished"

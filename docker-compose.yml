@@ -4,10 +4,11 @@ version: "3.7"
 services:
   moodle:
     image: moodle-test
+    restart: always
     build:
       context: .
       args:
-        MOODLE_VERSION: v3.8.3
+        MOODLE_VERSION: v3.7.6
     ports:
       - "80:80"
     volumes:
@@ -21,12 +22,13 @@ services:
     environment:
       DB_DRIVER: "pgsql"
       DB_HOST: "db"
-      DB_USER: "dev_user"
+      DB_USER: "postgres"
       DB_PASSWORD: "dev_passwd"
       MOODLE_ADMIN_PASSWORD: "admin_passwd"
 
   db:
     image: postgres:13-alpine
+    restart: always
     ports:
       - "5432:5432"
     networks:
@@ -34,7 +36,6 @@ services:
     volumes:
       - moodle-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: "dev_user"
       POSTGRES_PASSWORD: "dev_passwd"
       POSTGRES_DB: "moodle"
 
