@@ -83,7 +83,7 @@ if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
   echo "--> Database is empy, creating tables."
   create_tables
   create_tables_result=$?
-  until create_tables; do
+  until [[ create_tables ]]; do
     echo "==> Error creating database tables, trying again"
     check_db_connection
   done
