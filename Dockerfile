@@ -85,7 +85,7 @@ RUN mkdir -p "$MOODLEDATA_DIR" \
 COPY --from=base --chown=www-data:www-data /var/www/html /var/www/html
 WORKDIR "$MOODLE_DIR"
 COPY --chown=www-data:www-data ./scripts/docker-entrypoint.sh /usr/local/bin/
-COPY --chown=www-data:www-data ./scripts/check_db.php /scripts/check_db.php
+COPY --chown=www-data:www-data ./scripts/check-db-tables.php /scripts/
 STOPSIGNAL SIGWINCH
 EXPOSE 80 443
 VOLUME /var/www/moodledata

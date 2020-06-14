@@ -8,16 +8,48 @@ function err() {
 
 function write_config() {
   echo "--> Writing config file"
-  cmd="php $MOODLE_DIR/admin/cli/install.php --skip-database --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASSWORD --adminuser=$MOODLE_ADMIN_USER --adminpass=$MOODLE_ADMIN_PASSWORD --adminemail=$MOODLE_ADMIN_EMAIL --non-interactive --agree-license --lang=en --wwwroot=http://127.0.0.1:80 --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME"
-  #cmd="php $MOODLE_DIR/admin/cli/install_database.php --agree-license --adminpass=$MOODLE_ADMIN_PASSWORD"
-  eval "$cmd"
+  php $MOODLE_DIR/admin/cli/install.php --skip-database --non-interactive --agree-license \
+    --dataroot=$MOODLEDATA_DIR \
+    --dbtype=$DB_DRIVER \
+    --dbhost=$DB_HOST \
+    --dbname=$DB_NAME \
+    --dbport=$DB_PORT \
+    --dbuser=$DB_USER \
+    --dbpass=$DB_PASSWORD \
+    --adminuser=$MOODLE_ADMIN_USER \
+    --adminpass=$MOODLE_ADMIN_PASSWORD \
+    --adminemail=$MOODLE_ADMIN_EMAIL \
+    --lang=en --wwwroot=http://127.0.0.1:80 \
+    --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
+  echo "RESULT: $?"
+}
+
+function check_db_connection() {
+  # Check if database is open for connection
+  echo "--> Checking if database connection on $DB_HOST:$DB_PORT is open"
+  until nc -z -v -w30 "$DB_HOST" "$DB_PORT"; do
+    echo "--> Waiting for database connection for 5 seconds..."
+    sleep 5
+  done
+  echo "--> Database on $DB_HOST:$DB_PORT is open for connection"
 }
 
 function create_tables() {
   echo "--> Creating Moodle tables on database"
-  cmd="php $MOODLE_DIR/admin/cli/install.php --dataroot=$MOODLEDATA_DIR --dbtype=$DB_DRIVER --dbhost=$DB_HOST --dbname=$DB_NAME --dbport=$DB_PORT --dbuser=$DB_USER --dbpass=$DB_PASSWORD --adminuser=$MOODLE_ADMIN_USER --adminpass=$MOODLE_ADMIN_PASSWORD --adminemail=$MOODLE_ADMIN_EMAIL --non-interactive --agree-license --lang=en --wwwroot=http://127.0.0.1:80 --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME"
-  #cmd="php $MOODLE_DIR/admin/cli/install_database.php --agree-license --adminpass=$MOODLE_ADMIN_PASSWORD"
-  eval "$cmd"
+  php $MOODLE_DIR/admin/cli/install.php --non-interactive --agree-license  \
+    --dataroot=$MOODLEDATA_DIR \
+    --dbtype=$DB_DRIVER \
+    --dbhost=$DB_HOST \
+    --dbname=$DB_NAME \
+    --dbport=$DB_PORT \
+    --dbuser=$DB_USER \
+    --dbpass=$DB_PASSWORD \
+    --adminuser=$MOODLE_ADMIN_USER \
+    --adminpass=$MOODLE_ADMIN_PASSWORD \
+    --adminemail=$MOODLE_ADMIN_EMAIL \
+    --lang=en --wwwroot=http://127.0.0.1:80 \
+    --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
+  return $?
 }
 
 # Decide port for database if it is not set
@@ -34,27 +66,31 @@ if [[ -z "${DB_PORT:-}" ]]; then
   esac
 fi
 
-# Check if database is open for connection
-echo "--> Checking if database connection on $DB_HOST:$DB_PORT is open"
-until nc -z -v -w30 "$DB_HOST" "$DB_PORT"; do
-  echo "--> Waiting for database connection for 5 seconds..."
-  sleep 5
-done
-echo "--> Database on $DB_HOST:$DB_PORT is open for connection"
+# Check if db is open for connections
+check_db_connection
 
 # Check if DB_USER is set, if not, it is root
 if [[ -z "${DB_USER:-}"  ]]; then
   export DB_USER="root"
 fi
 
-php /scripts/check_db.php
+# Check if tables on db are already created
+php /scripts/check-db-tables.php
 check_db_return=$?
 
+# If is empty
 if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
+  echo "--> Database is empy, creating tables."
   create_tables
+  create_tables_result=$?
+  until create_tables; do
+    echo "==> Error creating database tables, trying again"
+    check_db_connection
+  done
 elif (( $check_db_return == 0 )); then
   echo "--> Continuing Moodle installation."
   write_config
+  echo "STATUS: $?"
 elif (( $check_db_return == -1 )); then
   err "--> Error on check_db.php script"
 else
