@@ -73,7 +73,7 @@ function create_tables() {
     --lang=en --wwwroot=http://127.0.0.1:80 \
     --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
   result=$?
-  if (( result != 0 )); then
+  if (( $result != 0 )); then
     err "--> Error creating database tables"
   fi
 }
