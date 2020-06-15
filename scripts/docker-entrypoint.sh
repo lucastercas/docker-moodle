@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -uo pipefail
 
 function err() {
@@ -133,6 +134,10 @@ fi
 
 echo "==> Purging caches"
 php "$MOODLE_DIR"/admin/cli/purge_caches.php
+purge_result=$?
+if (( purge_result != 0)); then
+  err "--> Error purging caches"
+fi
 
 echo "==> Executing apache"
 exec /usr/sbin/apache2ctl -DFOREGROUND
