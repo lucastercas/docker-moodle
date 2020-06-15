@@ -17,89 +17,7 @@ function check_db_connection() {
 }
 
 function write_config() {
-  echo "--> Writing config file"
-  php $MOODLE_DIR/admin/cli/install.php --skip-database --non-interactive --agree-license \
-    --dataroot=$MOODLEDATA_DIR \
-    --dbtype=$DB_DRIVER \
-    --dbhost=$DB_HOST \
-    --dbname=$DB_NAME \
-    --dbport=$DB_PORT \
-    --dbuser=$DB_USER \
-    --dbpass=$DB_PASSWORD \
-    --adminuser=$MOODLE_ADMIN_USER \
-    --adminpass=$MOODLE_ADMIN_PASSWORD \
-    --adminemail=$MOODLE_ADMIN_EMAIL \
-    --lang=en --wwwroot=http://127.0.0.1:80 \
-    --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
-  return $?
-}
-
-function create_tables() {
-  echo "--> Creating Moodle tables on database"
-  php $MOODLE_DIR/admin/cli/install.php --non-interactive --agree-license  \
-    --dataroot=$MOODLEDATA_DIR \
-    --dbtype=$DB_DRIVER \
-    --dbhost=$DB_HOST \
-    --dbname=$DB_NAME \
-    --dbport=$DB_PORT \
-    --dbuser=$DB_USER \
-    --dbpass=$DB_PASSWORD \
-    --adminuser=$MOODLE_ADMIN_USER \
-    --adminpass=$MOODLE_ADMIN_PASSWORD \
-    --adminemail=$MOODLE_ADMIN_EMAIL \
-    --lang=en --wwwroot=http://127.0.0.1:80 \
-    --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
-  return $?
-}
-
-# Decide port for database if it is not set
-if [[ -z "${DB_PORT:-}" ]]; then
-  case "${DB_DRIVER}" in
-    mysqli)
-      export DB_PORT="3306"
-      ;;
-    pgsql)
-      export DB_PORT="5432"
-      ;;
-    *)
-      err "Invalid DB_DRIVER: ${DB_DRIVER}"
-  esac
-fi
-
-# Check if db is open for connections
-check_db_connection
-
-# Check if DB_USER is set, if not, it is root
-if [[ -z "${DB_USER:-}"  ]]; then
-  export DB_USER="root"
-fi
-
-# Check if tables on db are already created
-php /scripts/check-db-tables.php
-check_db_return=$?
-
-# If is empty
-if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
-  echo "--> Database is empty, creating tables."
-  create_tables
-  create_tables_result=$?
-  until [[ create_tables ]]; do
-    echo "==> Error creating database tables, trying again"
-    check_db_connection
-  done
-elif (( $check_db_return == 0 )); then
-  until [[ write_config ]]; do
-    if [[ -f "$MOODLE_DIR"/config.php ]]; then
-      rm "$MOODLE_DIR"/config.php
-    fi
-  done
-elif (( $check_db_return == -1 )); then
-  err "--> Error on check_db.php script"
-else
-  err "--> Error getting database status"
-fi
-
-mv "$MOODLE_DIR"/config.php "$MOODLE_DIR"/config.bk.php
+  echo "--> Writing configuration file"
 cat > "$MOODLE_DIR"/config.php <<EOF
 <?php
 
@@ -137,6 +55,72 @@ require_once(__DIR__ . '/lib/setup.php');
 
 // No closing tag on this file
 EOF
+}
+
+function create_tables() {
+  echo "--> Creating Moodle tables on database"
+  php $MOODLE_DIR/admin/cli/install.php --non-interactive --agree-license  \
+    --dataroot=$MOODLEDATA_DIR \
+    --dbtype=$DB_DRIVER \
+    --dbhost=$DB_HOST \
+    --dbname=$DB_NAME \
+    --dbport=$DB_PORT \
+    --dbuser=$DB_USER \
+    --dbpass=$DB_PASSWORD \
+    --adminuser=$MOODLE_ADMIN_USER \
+    --adminpass=$MOODLE_ADMIN_PASSWORD \
+    --adminemail=$MOODLE_ADMIN_EMAIL \
+    --lang=en --wwwroot=http://127.0.0.1:80 \
+    --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
+  result=$?
+  echo "Result: $result"
+  return $result
+}
+
+# Decide port for database if it is not set
+if [[ -z "${DB_PORT:-}" ]]; then
+  case "${DB_DRIVER}" in
+    mysqli)
+      export DB_PORT="3306"
+      ;;
+    pgsql)
+      export DB_PORT="5432"
+      ;;
+    *)
+      err "Invalid DB_DRIVER: ${DB_DRIVER}"
+  esac
+fi
+
+# Check if db is open for connections
+check_db_connection
+
+# Check if DB_USER is set, if not, it is root
+if [[ -z "${DB_USER:-}"  ]]; then
+  export DB_USER="root"
+fi
+
+# Check if tables on db are already created
+php /scripts/check-db-tables.php
+check_db_return=$?
+
+# If is empty
+if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
+  echo "--> Database is empty, creating tables."
+  if [[ ! create_tables ]]; then
+    err "--> Error creating database tables, trying again"
+  fi
+  if [[ -f "$MOODLE_DIR"/config.php ]]; then
+    mv "$MOODLE_DIR"/config.php "$MOODLE_DIR"/config.bk.php
+  fi
+  write_config
+elif (( $check_db_return == 0 )); then
+  echo "--> Moodle already configured on database."
+  write_config
+elif (( $check_db_return == -1 )); then
+  err "--> Error on check_db.php script"
+else
+  err "--> Error getting database status"
+fi
 
 echo "--> Configuration finished"
 chown www-data:www-data "$MOODLE_DIR/config.php"

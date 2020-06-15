@@ -115,14 +115,14 @@ else if ($CFG->dbtype === "pgsql") $tables = getTablesPostgresSQL();
 
 if ($tables) {
   if (array_key_exists("config", $tables) || array_key_exists("mdl_config", $tables)) {
-    echo "--> Moodle tables already on DB.\n";
+    # If database alreay has moodle tables
     exit(0);
   } else {
-    echo "--> Database has tables, but not Moodle ones.\n";
+    # Database has tables, but not Moodle ones
     exit(1);
   }
 } else {
-  echo "--> No tables on database.\n";
+  # No tables on database.
   exit (2);
 }
 exit(-1); 
