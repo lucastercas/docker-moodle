@@ -6,6 +6,16 @@ function err() {
   exit -1
 }
 
+function check_db_connection() {
+  # Check if database is open for connection
+  echo "--> Checking if database connection on $DB_HOST:$DB_PORT is open"
+  until nc -z -v -w30 "$DB_HOST" "$DB_PORT"; do
+    echo "--> Waiting for database connection for 5 seconds..."
+    sleep 5
+  done
+  echo "--> Database on $DB_HOST:$DB_PORT is open for connection"
+}
+
 function write_config() {
   echo "--> Writing config file"
   php $MOODLE_DIR/admin/cli/install.php --skip-database --non-interactive --agree-license \
@@ -21,17 +31,7 @@ function write_config() {
     --adminemail=$MOODLE_ADMIN_EMAIL \
     --lang=en --wwwroot=http://127.0.0.1:80 \
     --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
-  echo "RESULT: $?"
-}
-
-function check_db_connection() {
-  # Check if database is open for connection
-  echo "--> Checking if database connection on $DB_HOST:$DB_PORT is open"
-  until nc -z -v -w30 "$DB_HOST" "$DB_PORT"; do
-    echo "--> Waiting for database connection for 5 seconds..."
-    sleep 5
-  done
-  echo "--> Database on $DB_HOST:$DB_PORT is open for connection"
+  return $?
 }
 
 function create_tables() {
@@ -80,7 +80,7 @@ check_db_return=$?
 
 # If is empty
 if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
-  echo "--> Database is empy, creating tables."
+  echo "--> Database is empty, creating tables."
   create_tables
   create_tables_result=$?
   until [[ create_tables ]]; do
@@ -88,9 +88,11 @@ if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
     check_db_connection
   done
 elif (( $check_db_return == 0 )); then
-  echo "--> Continuing Moodle installation."
-  write_config
-  echo "STATUS: $?"
+  until [[ write_config ]]; do
+    if [[ -f "$MOODLE_DIR"/config.php ]]; then
+      rm "$MOODLE_DIR"/config.php
+    fi
+  done
 elif (( $check_db_return == -1 )); then
   err "--> Error on check_db.php script"
 else
