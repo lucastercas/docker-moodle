@@ -73,8 +73,9 @@ function create_tables() {
     --lang=en --wwwroot=http://127.0.0.1:80 \
     --fullname=$MOODLE_NAME --shortname=$MOODLE_NAME
   result=$?
-  echo "Result: $result"
-  return $result
+  if (( result != 0 )); then
+    err "--> Error creating database tables"
+  fi
 }
 
 # Decide port for database if it is not set
@@ -106,9 +107,7 @@ check_db_return=$?
 # If is empty
 if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
   echo "--> Database is empty, creating tables."
-  if [[ ! create_tables ]]; then
-    err "--> Error creating database tables, trying again"
-  fi
+  create_tables
   if [[ -f "$MOODLE_DIR"/config.php ]]; then
     mv "$MOODLE_DIR"/config.php "$MOODLE_DIR"/config.bk.php
   fi
