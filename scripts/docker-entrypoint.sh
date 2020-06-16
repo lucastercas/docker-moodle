@@ -56,17 +56,18 @@ require_once(__DIR__ . '/lib/setup.php');
 
 // No closing tag on this file
 EOF
+  chown www-data:www-data "$MOODLE_DIR"/config.php
 }
 
 function create_tables() {
   echo "--> Creating Moodle tables on database"
-  php $MOODLE_DIR/admin/cli/install.php --non-interactive --agree-license  \
-    --dataroot=$MOODLEDATA_DIR \
-    --dbtype=$DB_DRIVER \
-    --dbhost=$DB_HOST \
-    --dbname=$DB_NAME \
-    --dbport=$DB_PORT \
-    --dbuser=$DB_USER \
+  php "$MOODLE_DIR"/admin/cli/install.php --non-interactive --agree-license  \
+    --dataroot="$MOODLEDATA_DIR" \
+    --dbtype="$DB_DRIVER" \
+    --dbhost="$DB_HOST" \
+    --dbname="$DB_NAME" \
+    --dbport="$DB_PORT" \
+    --dbuser="$DB_USER" \
     --dbpass=$DB_PASSWORD \
     --adminuser=$MOODLE_ADMIN_USER \
     --adminpass=$MOODLE_ADMIN_PASSWORD \
@@ -123,7 +124,6 @@ else
 fi
 
 echo "--> Configuration finished"
-chown www-data:www-data "$MOODLE_DIR/config.php"
 
 # TODO: Maybe call a bash script instead?
 # In case a custom Moodle installation need to set extra plugins or parameters,
@@ -133,8 +133,10 @@ if [[ -f "/scripts/configure_moodle.php" ]]; then
 fi
 
 echo "==> Purging caches"
-php "$MOODLE_DIR"/admin/cli/purge_caches.php
+purge_cache=`php "$MOODLE_DIR"/admin/cli/purge_caches.php`
 purge_result=$?
+echo "Purge of cache:$purge_cache"
+echo "Result: $purge_result"
 if (( purge_result != 0)); then
   err "--> Error purging caches"
 fi

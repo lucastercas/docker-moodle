@@ -6,7 +6,6 @@ RUN git clone --progress --single-branch --depth=1 -b "${MOODLE_VERSION}" git://
       && rm -rf "$MOODLE_DIR"/.git
 
 FROM debian:10.4-slim
-RUN  echo "Hello World"
 ARG MOODLE_VERSION="v3.8.3"
 ARG BUILD_VERSION
 ARG BUILD_NUMBER
