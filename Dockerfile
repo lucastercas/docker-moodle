@@ -65,11 +65,11 @@ RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \
       a2dismod mpm_event \
       && a2enmod rewrite; \
       service apache2 stop
-## Set Moodle settings
+# Set some defaults for Moodle env variables
 ENV MOODLE_DIR="/var/www/html" \
   MOODLEDATA_DIR="/var/www/moodledata" \
   MOODLE_ADMIN_USER="admin_user" \
-  MOODLE_ADMIN_EMAIL="mail@mail.com" \
+  MOODLE_ADMIN_EMAIL="moodle.admin@mail.com" \
   MOODLE_NAME="moodle" \
   DB_NAME="moodle"
 ARG DB_DRIVER

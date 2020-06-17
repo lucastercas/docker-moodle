@@ -38,7 +38,6 @@ global \$CFG;
   'dbport' => ${DB_PORT},
   'dbsocket' => '',
 );
-
 if (empty(\$_SERVER['HTTP_HOST'])) {
   \$_SERVER['HTTP_HOST'] = '127.0.0.1:80';
 }
@@ -49,11 +48,8 @@ if (isset(\$_SERVER['HTTPS']) && \$_SERVER['HTTPS'] == 'on') {
 };
 \$CFG->dataroot = '/var/www/moodledata';
 \$CFG->admin = 'admin';
-
 \$CFG->directorypermissions = 02777;
-
 require_once(__DIR__ . '/lib/setup.php');
-
 // No closing tag on this file
 EOF
   chown www-data:www-data "$MOODLE_DIR"/config.php
@@ -94,10 +90,14 @@ if [[ -z "${DB_PORT:-}" ]]; then
   esac
 fi
 
+if [[ -f "$MOODLE_DIR/config.php" ]]; then
+  rm  "$MOODLE_DIR/config.php"
+fi
+
 # Check if db is open for connections
 check_db_connection
 
-# Check if DB_USER is set, if not, it is root
+# Check if DB_USER is set, if not, it should be root
 if [[ -z "${DB_USER:-}"  ]]; then
   export DB_USER="root"
 fi
@@ -106,15 +106,16 @@ fi
 php /scripts/check-db-tables.php
 check_db_return=$?
 
-# If is empty
 if (( $check_db_return == 1 )) || (( $check_db_return == 2 )); then
+  # If database is empty
   echo "--> Database is empty, creating tables."
   create_tables
   if [[ -f "$MOODLE_DIR"/config.php ]]; then
-    mv "$MOODLE_DIR"/config.php "$MOODLE_DIR"/config.bk.php
+    rm "$MOODLE_DIR/config.php"
   fi
   write_config
 elif (( $check_db_return == 0 )); then
+  # If database has Moodle tables
   echo "--> Moodle already configured on database."
   write_config
 elif (( $check_db_return == -1 )); then
@@ -125,9 +126,9 @@ fi
 
 echo "--> Configuration finished"
 
-# TODO: Maybe call a bash script instead?
 # In case a custom Moodle installation need to set extra plugins or parameters,
 # it can create this file and use it
+# TODO: Maybe call a bash script instead?
 if [[ -f "/scripts/configure_moodle.php" ]]; then
   php /scripts/configure_moodle.php
 fi
