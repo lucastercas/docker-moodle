@@ -59,6 +59,7 @@ RUN apt-get -y update && apt-get -y --no-install-recommends install apache2 \
       php"$PHP_VERSION"-xmlrpc \
       php"$PHP_VERSION"-xsl \
       php"$PHP_VERSION"-zip \
+      php"$PHP_VERSION"-redis \
       libapache2-mod-php"$PHP_VERSION" \
       && apt-get purge -y --auto-remove \
       && rm -rf /var/lib/apt/lists/*; \

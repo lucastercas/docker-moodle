@@ -76,6 +76,13 @@ function create_tables() {
   fi
 }
 
+# Remove config.php if present, because installation can't continue
+# if it's present
+if [[ -f "$MOODLE_DIR/config.php" ]]; then
+  echo "File config.php present. Removing it"
+  rm  "$MOODLE_DIR/config.php"
+fi
+
 # Decide port for database if it is not set
 if [[ -z "${DB_PORT:-}" ]]; then
   case "${DB_DRIVER}" in
@@ -88,10 +95,6 @@ if [[ -z "${DB_PORT:-}" ]]; then
     *)
       err "Invalid DB_DRIVER: ${DB_DRIVER}"
   esac
-fi
-
-if [[ -f "$MOODLE_DIR/config.php" ]]; then
-  rm  "$MOODLE_DIR/config.php"
 fi
 
 # Check if db is open for connections
@@ -136,8 +139,6 @@ fi
 echo "==> Purging caches"
 purge_cache=`php "$MOODLE_DIR"/admin/cli/purge_caches.php`
 purge_result=$?
-echo "Purge of cache:$purge_cache"
-echo "Result: $purge_result"
 if (( purge_result != 0)); then
   err "--> Error purging caches"
 fi
