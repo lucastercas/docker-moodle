@@ -1,0 +1,21 @@
+---
+name: Sync ReadMe
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Sync
+        uses: ms-jpq/sync-dockerhub-readme@v1
+        with:
+          user: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_USERNAME }}/moodle
+          readme: "./README.md"
